@@ -1,6 +1,6 @@
-game:GetService("StarterGui"):SetCore("SendNotification",{ Title = "成功进入"; Text ="帅·脚本V3"; Duration = 4; })
+game:GetService("StarterGui"):SetCore("SendNotification",{ Title = "成功进入"; Text ="帅·脚本"; Duration = 4; })
 local OrionLib = loadstring(game:HttpGet('https://pastebin.com/raw/xLRUSiKx'))()
-local Window = OrionLib:MakeWindow({Name = "帅·脚本V3", HidePremium = false, SaveConfig = true,IntroText = "帅·脚本V3", ConfigFolder = "帅·脚本V3"})
+local Window = OrionLib:MakeWindow({Name = "帅·脚本", HidePremium = false, SaveConfig = true,IntroText = "帅·脚本", ConfigFolder = "帅·脚本"})
 game:GetService("StarterGui"):SetCore("SendNotification",{ Title = "欢迎，此为私人订制不可贩卖"; Text ="脚本"; Duration = 4; })
 local about = Window:MakeTab({
     Name = "你好",
