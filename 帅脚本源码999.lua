@@ -345,14 +345,14 @@ Tab:AddButton({
   	end
 })
 Tab:AddButton({
-	Name = "帅脚本测试版1",
+	Name = "帅脚本测试版",
 		Callback = function()
 loadstring(game:HttpGet("https://pastebin.com/raw/GR4ChWKv"))
     end
 })
 
 Tab:AddButton({
-	Name = "帅脚本测试版1卡密",
+	Name = "帅脚本测试版卡密",
 	Callback = function()
      setclipboard("027957")
   	end
