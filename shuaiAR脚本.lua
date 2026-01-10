@@ -145,7 +145,7 @@ repeat task.wait() until Confirmed
 local Window
 local windowSuccess, windowResult = pcall(function()
     return WindUI:CreateWindow({
-        Title = "帅脚本牛逼",
+        Title = "shuaiAR牛逼",
         Icon = "rbxassetid://90130746850054",
         Author = "感谢",
         Folder = "ColdSilence",
@@ -185,12 +185,12 @@ task.defer(function()
     print("✅ 小帅优化完成 | 当前用量:", math.floor((collectgarbage("count")/1024)).."MB")
 end)
 
-print("❤️ 帅脚本牛逼!")
+print("❤️ shuaiAR牛逼!")
 
 local Tabs = {}
 
 do
-    Tabs.MainTab = Window:Section({Title = "帅脚本牛逼", Opened = true})   
+    Tabs.MainTab = Window:Section({Title = "shuaiAR牛逼", Opened = true})   
    Tabs.CSJTab = Tabs.MainTab:Tab({ Title = "创世纪FE", Icon = "zap" })
    Tabs.MLTab = Tabs.MainTab:Tab({ Title = "melonFE", Icon = "zap" })
    Tabs.FWTab = Tabs.MainTab:Tab({ Title = "服务器漏洞", Icon = "zap" }) 
