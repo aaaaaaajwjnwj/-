@@ -1,5 +1,3 @@
---LM出品必是精品
-
 if not game:IsLoaded() then game.Loaded:Wait() end
 
 local Players = game:GetService("Players")
