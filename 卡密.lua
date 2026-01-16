@@ -1,3 +1,5 @@
+--LM出品必是精品
+
 if not game:IsLoaded() then game.Loaded:Wait() end
 
 local Players = game:GetService("Players")
@@ -10,7 +12,7 @@ local localPlayer = Players.LocalPlayer
 if not localPlayer then return end
 
 -- 主脚本URL（验证通过后加载这个）
-local MAIN_SCRIPT_URL = "链接放这里"loadstring(game:HttpGet("https://pandadevelopment.net/virtual/file/456a25a92b2b8d56"))()
+local MAIN_SCRIPT_URL = "loadstring(game:HttpGet("https://raw.githubusercontent.com/aaaaaaajwjnwj/-/refs/heads/main/obfuscated_script-1768569641877.lua"))()"
 
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "KeySystemUI"
@@ -119,9 +121,10 @@ GetKeyBtn.Parent = Content
 Status.Parent = Content
 Content.Parent = MainFrame
 MainFrame.Parent = ScreenGui
+--这里填卡密
 local validKeys = {
-    ["xiaomessy"] = true,
-    ["LM-NBNBYISFR"] = true,
+    ["xiaomessy"] = true,--卡密那两个字替换为你自己要的卡密
+    ["xs-NBNBYISFR"] = true,
     ["搞鸡吗"] = true,
     ["小帅卡密"] = true
 }
@@ -261,7 +264,7 @@ end)
 GetKeyBtn.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
         -- 卡密获取链接
-        local keyLink = "1070646590"
+        local keyLink = "1075226283"
         
         -- 设置输入框文本以便用户可以复制
         KeyInput.Text = keyLink
@@ -285,7 +288,7 @@ GetKeyBtn.InputBegan:Connect(function(input)
                 
                 StarterGui:SetCore("SendNotification", {
                     Title = "请加q群获取",
-                    Text = "1070646590",
+                    Text = "1075226283",
                     Duration = 20
                 })
             end
