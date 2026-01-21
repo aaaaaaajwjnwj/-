@@ -1,0 +1,1356 @@
+--    我曾见过无数的天才倒在我的面前
+--    而我不会成为其中之一
+--藏进心口的刺，不忘寻也如此，沉默有时最后因你放肆，浓墨难沾心事，寒夜怎寄相思，沉默有时念想有时，谁诀别相思成疾，莫问天涯也莫问归期，怎奈何无人了解，情断之时冷暖自知，谁诀别相思成疾，莫问天涯也莫问归期怎奈何无人了解，我心思
+--    TNINE HUB Script团队
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local RunService = game:GetService("RunService")
+local TeleportService = game:GetService("TeleportService")
+local HttpService = game:GetService("HttpService")
+local StarterGui = game:GetService("StarterGui")
+local VirtualUser = game:GetService("VirtualUser")
+
+local Red = Color3.fromRGB(255, 0, 0)
+local Blue = Color3.fromRGB(0, 120, 255)
+local LocalPlayer = Players.LocalPlayer
+local CurrentCamera = Workspace.CurrentCamera
+
+-- 加载 UI 库
+local UI_Library_URL = "https://raw.githubusercontent.com/114514lzkill/ui/refs/heads/main/ui.lua"
+local Library = loadstring(game:HttpGet(UI_Library_URL))()
+
+-- 创建窗口
+local WindUI = Library
+local Window = Library:CreateWindow({
+    ["Folder"] = "帅脚本",
+    ["Title"] = "shuai Hub",
+    ["Author"] = "wind ui",
+    ["Icon"] = "rbxassetid://7734068321",
+    HideSearchBar = false,
+})
+
+-------------------------------------------------------------------------
+-- Tab: 公告 (Announcements)
+-------------------------------------------------------------------------
+local Tab_Notice = Window:Tab({
+    ["Locked"] = false,
+    ["Title"] = "公告",
+    ["Icon"] = "rbxassetid://115466270141583",
+})
+
+Tab_Notice:Section({
+    TextSize = 17,
+    ["Title"] = "请保佑我小帅还记得以前我从怕步机转到罗布勒斯刚开始我玩河北唐县看见天上有很多人在飞我好奇的问，你怎么会飞他们跟我讲这是脚本我向他们讨要他们给了我我耐心的学习他们教我怎么用后来我接触到了脚本圈现在群人数越来越多麻烦的事也越来越多我不知道我该选择中立还是选择帮一方不知道是该帮龙王还是帮TNINE HUB Script   可是在我最无助的时候是TNINE HUB Script邀请我进入我选择站在中立方面不知道TNINE HUB Script会怎么选",
+    TextXAlignment = "Left",
+})
+
+Tab_Notice:Section({
+    TextSize = 17,
+    ["Title"] = "messy(凌乱)帮助小帅修改此脚本 更多脚本请关注群内消息 谢谢",
+    TextXAlignment = "Left",
+})
+
+-------------------------------------------------------------------------
+-- Tab: 通用 (General)
+-------------------------------------------------------------------------
+local Tab_General = Window:Tab({
+    ["Locked"] = false,
+    ["Title"] = "通用",
+    ["Icon"] = "rbxassetid://18520370419",
+})
+
+Tab_General:Button({
+    ["Title"] = "反挂机",
+    ["Desc"] = "反挂机踢出",
+    ["Callback"] = function()
+        print("Anti Afk On")
+        LocalPlayer.Idled:Connect(function()
+            VirtualUser:Button2Down(Vector2.new(0, 0), CurrentCamera.CFrame)
+            wait(1)
+            VirtualUser:Button2Up(Vector2.new(0, 0), CurrentCamera.CFrame)
+        end)
+        StarterGui:SetCore("SendNotification", {
+            ["Title"] = "反挂机2已开启",
+            ["Text"] = "虽然不知道有没有增强",
+            ["Duration"] = 5,
+        })
+    end
+})
+
+Tab_General:Button({
+    ["Title"] = "无敌少侠飞行脚本",
+    ["Desc"] = "只支持R15",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Invinicible-Flight-R15-45414"))()
+    end
+})
+
+Tab_General:Button({
+    ["Title"] = "透视",
+    ["Desc"] = "还可以",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/ZIONPCE/raw/refs/heads/main/ESP.lua"))()
+    end
+})
+
+Tab_General:Button({
+    ["Title"] = "第一人称自瞄",
+    ["Desc"] = "第一人称的模式能开启",
+    ["Callback"] = function()
+        loadstring(game:HttpGet(https://raw.githubusercontent.com/Roblox-HttpSpy/Random-Silly-stuff/refs/heads/main/AimBotV2.lua"))()
+    end
+})
+Tab_General:Button({
+    ["Title"] = "爬行",
+    ["Desc"] = "猎奇",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/0Ben1/fe/main/obf_vZDX8j5ggfAf58QhdJ59BVEmF6nmZgq4Mcjt2l8wn16CiStIW2P6EkNc605qv9K4.lua.txt"))()
+    end
+})
+Tab_General:Button({
+    ["Title"] = "飞行",
+    ["Desc"] = "普通飞行",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/114514lzkill/-/refs/heads/main/%E9%A3%9E%E8%A1%8C%E8%84%9A%E6%9C%AC.lua"))()
+    end
+})
+
+Tab_General:Button({
+    ["Title"] = "开启玩家进出服务器提示",
+    ["Desc"] = "......",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/boyscp/scriscriptsc/main/bbn.lua"))()
+    end
+})
+
+Tab_General:Slider({
+    ["Title"] = "速度设置",
+    ["Step"] = 1,
+    ["Value"] = { Min = 16, Default = 16, Max = 1000 },
+    ["Callback"] = function(Value)
+        -- 注意：部分UI库传入的是table，如果是table取第一个值
+        local speed = type(Value) == "table" and Value[1] or Value
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+            LocalPlayer.Character.Humanoid.WalkSpeed = speed
+        end
+    end
+})
+
+Tab_General:Slider({
+    ["Title"] = "跳跃设置",
+    ["Step"] = 1,
+    ["Value"] = { Min = 50, Default = 50, Max = 200 },
+    ["Callback"] = function(Value)
+        local jump = type(Value) == "table" and Value[1] or Value
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+            LocalPlayer.Character.Humanoid.JumpPower = jump
+        end
+    end
+})
+
+Tab_General:Slider({
+    ["Title"] = "头部大小",
+    ["Step"] = 0.1,
+    ["Value"] = { Min = 0.5, Default = 1, Max = 100 },
+    ["Callback"] = function(Value)
+        -- 原逻辑似乎不完整，这里根据标题还原逻辑
+        local size = type(Value) == "table" and Value[1] or Value
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Head") then
+            LocalPlayer.Character.Head.Size = Vector3.new(size, size, size)
+        end
+    end
+})
+
+Tab_General:Slider({
+    ["Title"] = "重力设置",
+    ["Step"] = 1,
+    ["Value"] = { Min = 0, Default = 196.2, Max = 196.2 },
+    ["Callback"] = function(Value)
+        local grav = type(Value) == "table" and Value[1] or Value
+        Workspace.Gravity = grav
+    end
+})
+
+Tab_General:Slider({
+    ["Title"] = "超广角设置",
+    ["Step"] = 1,
+    ["Value"] = { Min = 20, Default = 70, Max = 120 },
+    ["Callback"] = function(Value)
+        local fov = type(Value) == "table" and Value[1] or Value
+        CurrentCamera.FieldOfView = fov
+    end
+})
+
+Tab_General:Button({
+    ["Title"] = "重新加入服务器",
+    ["Desc"] = "",
+    ["Callback"] = function()
+        TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, LocalPlayer)
+    end
+})
+
+Tab_General:Button({
+    ["Title"] = "离开服务器",
+    ["Desc"] = "",
+    ["Callback"] = function()
+        game:Shutdown()
+    end
+})
+
+-- FPS 显示逻辑
+Tab_General:Button({
+    ["Title"] = "帧率显示",
+    ["Desc"] = "显示",
+    ["Callback"] = function()
+        if LocalPlayer.PlayerGui:FindFirstChild("FPSGui") then return end
+        
+        local ScreenGui = Instance.new("ScreenGui")
+        ScreenGui.Name = "FPSGui"
+        ScreenGui.ResetOnSpawn = false
+        ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+        
+        local TextLabel = Instance.new("TextLabel")
+        TextLabel.Name = "FPSLabel"
+        TextLabel.Size = UDim2.new(0, 100, 0, 50)
+        TextLabel.Position = UDim2.new(0, 10, 0, 10)
+        TextLabel.BackgroundTransparency = 1
+        TextLabel.Font = Enum.Font.SourceSansBold
+        TextLabel.Text = "帧率: 0"
+        TextLabel.TextSize = 20
+        TextLabel.TextColor3 = Color3.new(1, 1, 1)
+        TextLabel.Parent = ScreenGui
+        
+        ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+        
+        RunService.RenderStepped:Connect(function()
+            local fps = math.floor(1 / RunService.RenderStepped:Wait())
+            TextLabel.Text = "帧率: " .. fps
+        end)
+    end
+})
+
+-- 时间显示逻辑
+Tab_General:Button({
+    ["Title"] = "时间显示",
+    ["Desc"] = "显示",
+    ["Callback"] = function()
+        if game.CoreGui:FindFirstChild("LBLG") then return end
+
+        local ScreenGui = Instance.new("ScreenGui")
+        ScreenGui.Name = "LBLG"
+        ScreenGui.Parent = game.CoreGui
+        ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+        
+        local TextLabel = Instance.new("TextLabel")
+        TextLabel.Name = "LBL"
+        TextLabel.Parent = ScreenGui
+        TextLabel.BackgroundColor3 = Color3.new(1, 1, 1)
+        TextLabel.BackgroundTransparency = 1
+        TextLabel.BorderColor3 = Color3.new(0, 0, 0)
+        TextLabel.Position = UDim2.new(0.75, 0, 0.01, 0)
+        TextLabel.Size = UDim2.new(0, 133, 0, 30)
+        TextLabel.Font = Enum.Font.GothamSemibold
+        TextLabel.TextColor3 = Color3.new(1, 1, 1)
+        TextLabel.TextScaled = true
+        TextLabel.TextSize = 14
+        TextLabel.TextWrapped = true
+        
+        RunService.Heartbeat:Connect(function()
+            -- 这里使用 os.date 格式化时间，修复原始逻辑的复杂时间戳计算
+            local currentTime = os.date("%H时%M分%S秒")
+            TextLabel.Text = "北京时间:" .. currentTime
+        end)
+    end
+})
+
+Tab_General:Button({
+    ["Title"] = "重开",
+    ["Desc"] = "乐子重开",
+    ["Callback"] = function()
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+            LocalPlayer.Character.Humanoid.Health = 0
+        end
+    end
+})
+
+Tab_General:Button({
+    ["Title"] = "后门脚本",
+    ["Desc"] = "后门",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/iK4oS/backdoor.exe/v6x/source.lua"))()
+    end
+})
+
+Tab_General:Button({
+    ["Title"] = "偷别人物品拿道具",
+    ["Desc"] = "小偷",
+    ["Callback"] = function()
+        -- 原始逻辑是不断循环将背包里的东西重新Parent回背包
+        -- 这看起来像是一个“刷新库存”或者防止掉落的逻辑，或者尝试卡Bug
+        local Backpack = LocalPlayer.Backpack
+        for i = 1, 10 do -- 还原原代码展开的多次循环
+            for _, item in pairs(Backpack:GetChildren()) do
+                item.Parent = Backpack
+            end
+            wait()
+        end
+    end
+})
+
+Tab_General:Button({
+    ["Title"] = "飞檐走壁",
+    ["Desc"] = "飞起来",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://pastebin.com/raw/zXk4Rq2r"))()
+    end
+})
+
+-- 网易云音乐逻辑
+Tab_General:Button({
+    ["Title"] = "网易云",
+    ["Desc"] = "听音乐",
+    ["Callback"] = function()
+        -- 这是一个内嵌的音乐播放器UI
+        local MusicScript = loadstring(game:HttpGet("https://github.com/DevSloPo/Auto/raw/main/Ware-obfuscated.lua"))()
+        local MusicUI = MusicScript:new("帅脚本 | 音乐")
+        
+        local SearchTab = MusicUI:Tab("搜索")
+        local SearchSection = SearchTab:section("搜索", true)
+        
+        local ResultTab = MusicUI:Tab("数量")
+        local ResultSection = ResultTab:section("结果", true)
+        local ResultLabel = ResultSection:Label("搜索结果数量: 0")
+
+        SearchSection:Textbox("请输入歌曲名称", "", "输入歌曲名称后按回车", function(input)
+            local songName = input[1] -- 假设输入框返回table
+            local encodedName = HttpService:UrlEncode(songName)
+            local url = "https://music.163.com/api/search/get?s=" .. encodedName .. "&type=1&limit=100"
+            
+            local response = game:HttpGet(url)
+            local data = HttpService:JSONDecode(response)
+            
+            ResultSection:Label("当前搜索: " .. songName)
+            
+            if data and data.result and data.result.songs then
+                local songs = data.result.songs
+                if #songs > 0 then
+                   -- 原代码逻辑似乎在此中断，这里应该有播放逻辑，但原始代码未包含完整播放部分
+                   print("找到歌曲: " .. #songs .. "首")
+                   ResultLabel:Set("搜索结果数量: " .. #songs)
+                else
+                   print("未找到相关歌曲")
+                   ResultLabel:Set("搜索结果数量: 0")
+                end
+            else
+                print("API请求失败")
+            end
+        end)
+        
+        -- 占位按钮
+        SearchSection:Button("开始播放音乐", function() print("没有歌曲可播放") end)
+        SearchSection:Button("停止播放音乐", function() print("没有正在播放的歌曲") end)
+    end
+})
+
+Tab_General:Button({
+    ["Title"] = "老外撸管脚本r15",
+    ["Desc"] = "撸管",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://pastefy.app/YZoglOyJ/raw"))()
+    end
+})
+
+Tab_General:Button({
+    ["Title"] = "老外撸管脚本r6",
+    ["Desc"] = "撸管",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://pastefy.app/wa3v2Vgm/raw"))()
+    end
+})
+
+Tab_General:Button({
+    ["Title"] = "吸人(一局只能吸一次)",
+    ["Desc"] = "吸人",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://pastebin.com/raw/PVPFXqtH"))()
+    end
+})
+
+Tab_General:Button({
+    ["Title"] = "获取管理员",
+    ["Desc"] = "管理员",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://pastebin.com/raw/sZpgTVas"))()
+    end
+})
+
+Tab_General:Button({
+    ["Title"] = "快速旋转",
+    ["Desc"] = "转起来",
+    ["Callback"] = function()
+        local Character = LocalPlayer.Character
+        local Humanoid = Character:FindFirstChild("Humanoid")
+        
+        -- 动画播放逻辑
+        spawn(function()
+            local anim = Instance.new("Animation")
+            anim.AnimationId = "rbxassetid://507776043"
+            local track = Humanoid:LoadAnimation(anim)
+            track:Play()
+            track:AdjustSpeed(0)
+            
+            if Character:FindFirstChild("Animate") then
+                Character.Animate.Disabled = true
+            end
+            
+            -- 声音播放
+            local sound = Instance.new("Sound")
+            sound.Name = "Sound"
+            sound.SoundId = "http://www.roblox.com/asset/?id=8114290584"
+            sound.Volume = 0
+            sound.Looped = false
+            sound.Parent = Workspace
+            sound:Play()
+            
+            wait()
+            
+            -- 旋转物理逻辑
+            local bav = Instance.new("BodyAngularVelocity")
+            bav.Name = "Spinning"
+            bav.Parent = Character.HumanoidRootPart
+            bav.MaxTorque = Vector3.new(0, math.huge, 0)
+            bav.AngularVelocity = Vector3.new(0, 30, 0)
+            
+            wait(3.5)
+            -- 后续清理或检查逻辑
+        end)
+    end
+})
+
+Tab_General:Button({
+    ["Title"] = "极速旋转",
+    ["Desc"] = "转起来",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://pastebin.com/raw/ckiGL34v"))()
+    end
+})
+
+Tab_General:Button({
+    ["Title"] = "锁定视角",
+    ["Desc"] = "锁定",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://pastebin.com/raw/gdLR5Z7X"))()
+    end
+})
+
+Tab_General:Button({
+    ["Title"] = "无限跳",
+    ["Desc"] = "无限跳",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://pastebin.com/raw/V5PQy3y0", true))()
+    end
+})
+
+Tab_General:Button({
+    ["Title"] = "灵魂出窍",
+    ["Desc"] = "灵魂出窍",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://pastebin.com/raw/ahK5jRxM"))()
+    end
+})
+
+Tab_General:Button({
+    ["Title"] = "让走路和跳跃变卡(对别人没影响)",
+    ["Desc"] = "卡死你",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/GhostPlayer352/Test4/main/Fe%20Fake%20Lag%20Obfuscator"))()
+    end
+})
+
+Tab_General:Button({
+    ["Title"] = "穿墙(可关闭)",
+    ["Desc"] = "穿墙",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/TtmScripter/OtherScript/main/Noclip"))()
+    end
+})
+
+Tab_General:Button({
+    ["Title"] = "阿尔宙斯注入器3.0",
+    ["Desc"] = "阿尔宙斯注入器老版本",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/AZYsGithub/chillz-workshop/main/Arceus%20X%20V3"))()
+    end
+})
+
+Tab_General:Button({
+    ["Title"] = "选人甩飞（需要输入别人的名字）",
+    ["Desc"] = "帅飞",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/GhostPlayer352/Test4/main/Auto%20Fling%20Player"))()
+    end
+})
+
+Tab_General:Button({
+    ["Title"] = "飞车",
+    ["Desc"] = "让车飞起来",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/114514lzkill/xsFLY/refs/heads/main/xsVFLY.lua"))()
+    end
+})
+
+Tab_General:Button({
+    ["Title"] = "甩飞",
+    ["Desc"] = "帅飞",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/114514lzkill/xsfly2.0/refs/heads/main/xsfly2.0.lua"))()
+    end
+})
+
+Tab_General:Button({
+    ["Title"] = "点击传送工器",
+    ["Desc"] = "传送",
+    ["Callback"] = function()
+        local Mouse = LocalPlayer:GetMouse()
+        local Tool = Instance.new("Tool")
+        Tool.RequiresHandle = false
+        Tool.Name = "[bs中心]传送工具"
+        Tool.Activated:Connect(function()
+            local pos = Mouse.Hit.Position + Vector3.new(0, 2.5, 0)
+            if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(pos)
+            end
+        end)
+        Tool.Parent = LocalPlayer.Backpack
+    end
+})
+
+-------------------------------------------------------------------------
+-- Tab: 范围 (Range/Hitbox)
+-------------------------------------------------------------------------
+local Tab_Range = Window:Tab({
+    ["Locked"] = false,
+    ["Title"] = "范围",
+    ["Icon"] = "rbxassetid://87107069659024",
+})
+
+-- 辅助函数：修改玩家碰撞箱
+local function ResizeHitbox(size, transparency)
+    _G.HeadSize = size
+    _G.Disabled = true
+    
+    RunService.RenderStepped:Connect(function()
+        if _G.Disabled then
+            for _, player in pairs(Players:GetPlayers()) do
+                if player ~= LocalPlayer then
+                    -- 尝试获取角色并修改
+                    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                        local hrp = player.Character.HumanoidRootPart
+                        hrp.Size = Vector3.new(size, size, size)
+                        hrp.Transparency = transparency or 0.7
+                        hrp.CanCollide = false
+                    end
+                end
+            end
+        end
+    end)
+end
+
+Tab_Range:Button({
+    ["Title"] = "普通范围",
+    ["Desc"] = "范围",
+    ["Callback"] = function()
+        ResizeHitbox(30)
+    end
+})
+
+Tab_Range:Button({
+    ["Title"] = "中等范围",
+    ["Desc"] = "范围",
+    ["Callback"] = function()
+        -- 原始逻辑仅开启循环但没有明确大小，推测与上一个类似或更大，这里假设为50
+        ResizeHitbox(50) 
+    end
+})
+
+Tab_Range:Button({
+    ["Title"] = "全图范围",
+    ["Desc"] = "范围",
+    ["Callback"] = function()
+        ResizeHitbox(100) -- 假设为全图大小
+    end
+})
+
+Tab_Range:Button({
+    ["Title"] = "终极范围",
+    ["Desc"] = "范围",
+    ["Callback"] = function()
+        ResizeHitbox(200) -- 假设为终极大小
+    end
+})
+
+-------------------------------------------------------------------------
+-- Tab: 加入服务器 (Join Server)
+-------------------------------------------------------------------------
+local Tab_Join = Window:Tab({
+    ["Locked"] = false,
+    ["Title"] = "加入服务器",
+    ["Icon"] = "14895392107",
+})
+
+Tab_Join:Button({
+    ["Title"] = "加入极速传奇",
+    ["Desc"] = "加入",
+    ["Callback"] = function()
+        TeleportService:Teleport(3101667897, LocalPlayer)
+    end
+})
+
+Tab_Join:Button({
+    ["Title"] = "加入自然灾害生存游戏",
+    ["Desc"] = "加入",
+    ["Callback"] = function()
+        TeleportService:Teleport(189707, LocalPlayer)
+    end
+})
+
+Tab_Join:Button({
+    ["Title"] = "加入监狱人生",
+    ["Desc"] = "加入",
+    ["Callback"] = function()
+        TeleportService:Teleport(155615604, LocalPlayer)
+    end
+})
+
+-------------------------------------------------------------------------
+-- Tab: 死铁轨 (Dead Rails)
+-------------------------------------------------------------------------
+local Tab_DeadRails = Window:Tab({
+    ["Locked"] = false,
+    ["Title"] = "死铁轨",
+    ["Icon"] = "rbxassetid://108664063",
+})
+
+Tab_DeadRails:Button({
+    ["Title"] = "死铁轨攻速脚本",
+    ["Desc"] = "功速无敌",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/HeadHarse/DeadRails/refs/heads/main/V4SWING"))()
+    end
+})
+
+Tab_DeadRails:Button({
+    ["Title"] = "死铁轨自动胜利脚本",
+    ["Desc"] = "会自杀",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://rawscripts.net/raw/Dead-Rails-Alpha-Auto-Win-Script-for-Dead-Rails-Instant-win-AFK-farm-KEYLESS-39867"))()
+    end
+})
+
+Tab_DeadRails:Button({
+    ["Title"] = "SansHUB死铁轨脚本",
+    ["Desc"] = "要卡密",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/iopjklbnmsss/SansHubScript/refs/heads/main/SansHub"))()
+    end
+})
+
+Tab_DeadRails:Button({
+    ["Title"] = "死铁轨飞行",
+    ["Desc"] = "好用",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/AmareScripts/DeadRails/refs/heads/main/FlyV2%25viaTurret.lua"))()
+    end
+})
+
+Tab_DeadRails:Button({
+    ["Title"] = "死铁轨功能最多",
+    ["Desc"] = "好用",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://github.com/Synergy-Networks/products/raw/main/Rift/loader.lua"))()
+    end
+})
+
+Tab_DeadRails:Button({
+    ["Title"] = "死铁轨红叶脚本",
+    ["Desc"] = "要解卡",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://getnative.cc/script/loader"))()
+    end
+})
+
+Tab_DeadRails:Button({
+    ["Title"] = "死铁轨TX退休脚本",
+    ["Desc"] = "......",
+    ["Callback"] = function()
+        getgenv().TX = "退休脚本"
+        getgenv().QUN = "160369111"
+        loadstring(game:HttpGet("https://pastefy.app/64DctLM5/raw"))()
+    end
+})
+
+Tab_DeadRails:Button({
+    ["Title"] = "死铁轨RINGTA脚本",
+    ["Desc"] = "好用",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/ringtaa/DEADRAILSOP.github.io/refs/heads/main/ringta.lua"))()
+    end
+})
+
+Tab_DeadRails:Button({
+    ["Title"] = "死铁轨自动刷卷",
+    ["Desc"] = "好用",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/thiennrb7/Script/refs/heads/main/autobond"))()
+    end
+})
+
+Tab_DeadRails:Button({
+    ["Title"] = "死铁轨手动通关汉化（由帅记汉化）",
+    ["Desc"] = "由帅记汉化",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/114514lzkill/Dedrail/refs/heads/main/死铁轨手动通关汉化.lua"))()
+    end
+})
+
+-------------------------------------------------------------------------
+-- Tab: 俄亥俄州 (Ohio)
+-------------------------------------------------------------------------
+local Tab_Ohio = Window:Tab({
+    ["Locked"] = false,
+    ["Title"] = "俄亥俄州",
+    ["Icon"] = "rbxassetid://11949291636",
+})
+
+Tab_Ohio:Button({
+    ["Title"] = "XA俄亥俄州",
+    ["Desc"] = "好用无比",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Xingtaiduan/Script/refs/heads/main/Games/Ohio"))()
+    end
+})
+
+Tab_Ohio:Button({
+    ["Title"] = "宿摊自动刷钱",
+    ["Desc"] = "刷钱",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Sukuna2134/sukunascriptfree/refs/heads/main/%E5%AE%BF%E5%82%A9%E4%BF%84%E4%BA%A5%E4%BF%84%E5%B7%9E%E8%87%AA%E5%8A%A8%E6%8D%A2%E6%9C%8D%E6%8C%82%E6%9C%BA.lua"))()
+    end
+})
+
+Tab_Ohio:Button({
+    ["Title"] = "AL印钞机",
+    ["Desc"] = "刷钱",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/pijiaobenMSJMleng/ehhdvdhd/refs/heads/main/good.lua"))()
+    end
+})
+
+Tab_Ohio:Button({
+    ["Title"] = "SonwHUB",
+    ["Desc"] = "攻击XA",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/canxiaoxue666/SnowHubDemo/refs/heads/main/SnowHub"))()
+    end
+})
+
+-------------------------------------------------------------------------
+-- Tab: 被遗弃 (Abandoned)
+-------------------------------------------------------------------------
+local Tab_Abandoned = Window:Tab({
+    ["Locked"] = false,
+    ["Title"] = "被遗弃",
+    ["Icon"] = "rbxassetid://94876458579556",
+})
+
+Tab_Abandoned:Button({
+    ["Title"] = "情云",
+    ["Desc"] = "好用",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/ChinaQY/-/main/%E6%83%85%E4%BA%91"))()
+    end
+})
+
+Tab_Abandoned:Button({
+    ["Title"] = "某某脚本免费版",
+    ["Desc"] = "好用到爆炸",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/OWOWOWWOW/HTT/main/HT.lua"))()
+    end
+})
+
+Tab_Abandoned:Button({
+    ["Title"] = "被遗弃油管搬运脚本",
+    ["Desc"] = "不知道",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/SkibidiCen/MainMenu/main/Code"))()
+    end
+})
+
+Tab_Abandoned:Button({
+    ["Title"] = "被遗弃esp脚本",
+    ["Desc"] = "esp",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/sigmaboy-sigma-boy/sigmaboy-sigma-boy/refs/heads/main/StaminaSettings.ESP.PIDC.raw"))()
+    end
+})
+
+-------------------------------------------------------------------------
+-- Tab: 战争大亨 (War Tycoon)
+-------------------------------------------------------------------------
+local Tab_WarTycoon = Window:Tab({
+    ["Locked"] = false,
+    ["Title"] = "战争大亨",
+    ["Icon"] = "rbxassetid://13316963733",
+})
+
+Tab_WarTycoon:Button({
+    ["Title"] = "一枪秒人",
+    ["Desc"] = "不知道",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://pastebin.com/raw/6b4XEjQF"))()
+    end
+})
+
+Tab_WarTycoon:Button({
+    ["Title"] = "乌托邦战争大亨",
+    ["Desc"] = "...........",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/USA868/-/refs/heads/main/.github/workflows/%E6%88%98%E4%BA%89%E5%A4%A7%E4%BA%A8.lua"))()
+    end
+})
+
+-- Tab: Doors
+-------------------------------------------------------------------------
+local Tab_Doors = Window:Tab({
+    ["Locked"] = false,
+    ["Title"] = "doors",
+    ["Icon"] = "rbxassetid://10940966071",
+})
+
+Tab_Doors:Button({
+    ["Title"] = "BobHUB汉化",
+    ["Desc"] = "好用",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://pastebin.com/raw/65TwT8ja"))()
+    end
+})
+
+Tab_Doors:Button({
+    ["Title"] = "mspaint v3汉化",
+    ["Desc"] = "好用",
+    ["Callback"] = function()
+        getgenv()["Spy"] = "mspaint"
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/XiaoXuAnZang/XKscript/refs/heads/main/DOORS.txt"))()
+    end
+})
+
+Tab_Doors:Button({
+    ["Title"] = "微山2.3.2",
+    ["Desc"] = "愚人节",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://pastebin.com/raw/uHHp8fzS"))()
+    end
+})
+
+-------------------------------------------------------------------------
+-- Tab: 速度传奇 (Speed Legends)
+-------------------------------------------------------------------------
+local Tab_SpeedLegends = Window:Tab({
+    ["Locked"] = false,
+    ["Title"] = "速度传奇",
+    ["Icon"] = "rbxassetid://15949388921",
+})
+
+Tab_SpeedLegends:Button({
+    ["Title"] = "开启卡宠",
+    ["Desc"] = "要钱",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://pastebin.com/raw/uR6azdQQ"))()
+    end
+})
+
+-------------------------------------------------------------------------
+-- Tab: 墨水游戏 (Ink Game)
+-------------------------------------------------------------------------
+local Tab_Ink = Window:Tab({
+    ["Locked"] = false,
+    ["Title"] = "墨水游戏",
+    ["Icon"] = "rbxassetid://106484596651517",
+})
+
+Tab_Ink:Button({
+    ["Title"] = "XA",
+    ["Desc"] = "好用到爆",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Xingtaiduan/Script/refs/heads/main/Games/墨水游戏.lua"))()
+    end
+})
+
+Tab_Ink:Button({
+    ["Title"] = "TexRBLX",
+    ["Desc"] = "好用到爆",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/TexRBLX/Roblox-stuff/refs/heads/main/ink-game/testing.lua"))()
+    end
+})
+
+-------------------------------------------------------------------------
+-- Tab: 监狱人生 (Prison Life)
+-------------------------------------------------------------------------
+local Tab_PrisonLife = Window:Tab({
+    ["Locked"] = false,
+    ["Title"] = "监狱人生",
+    ["Icon"] = "rbxassetid://1839014184",
+})
+
+Tab_PrisonLife:Button({
+    ["Title"] = "手理剑",
+    ["Desc"] = "秒人",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/114514lzkill/jian/refs/heads/main/jian.lua"))()
+    end
+})
+
+Tab_PrisonLife:Button({
+    ["Title"] = "变车模型",
+    ["Desc"] = "真车",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://pastebin.com/raw/zLe3e4BS"))()
+    end
+})
+
+Tab_PrisonLife:Button({
+    ["Title"] = "杀所有人(不可关)",
+    ["Desc"] = "关不掉",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://pastebin.com/raw/kXjfpFPh"))()
+    end
+})
+
+Tab_PrisonLife:Button({
+    ["Title"] = "无敌模式",
+    ["Desc"] = "无敌",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://pastebin.com/raw/LdTVujTA"))()
+    end
+})
+
+-- 监狱人生传送点
+Tab_PrisonLife:Button({
+    ["Title"] = "警卫室",
+    ["Desc"] = "传送",
+    ["Callback"] = function()
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(847.7, 99, 2267.4)
+        end
+    end
+})
+
+Tab_PrisonLife:Button({
+    ["Title"] = "监狱室内",
+    ["Desc"] = "传送",
+    ["Callback"] = function()
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(919.2, 99, 2379.7)
+        end
+    end
+})
+
+Tab_PrisonLife:Button({
+    ["Title"] = "罪犯复活点",
+    ["Desc"] = "传送",
+    ["Callback"] = function()
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-937.6, 93.1, 2063.0)
+        end
+    end
+})
+
+Tab_PrisonLife:Button({
+    ["Title"] = "监狱室外",
+    ["Desc"] = "传送",
+    ["Callback"] = function()
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(760.6, 97, 2475.4)
+        end
+    end
+})
+
+Tab_PrisonLife:Button({
+    ["Title"] = "超强指令",
+    ["Desc"] = "不知道",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Asddffgujhh/-/refs/heads/main/%E7%9B%91%E7%8B%B1%E4%BA%BA%E7%94%9F%E8%B6%85%E5%BC%BA%E6%8C%87%E4%BB%A4"))()
+    end
+})
+
+-------------------------------------------------------------------------
+-- Tab: GB
+-------------------------------------------------------------------------
+local Tab_GB = Window:Tab({
+    ["Locked"] = false,
+    ["Title"] = "GB",
+    ["Icon"] = "rbxassetid://130924875419603",
+})
+
+Tab_GB:Button({
+    ["Title"] = "清风",
+    ["Desc"] = "国人脚本",
+    ["Callback"] = function()
+        -- 按钮回调为空，可能是占位符
+    end
+})
+
+Tab_GB:Button({
+    ["Title"] = "清风老大版",
+    ["Desc"] = "国人脚本",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://freenote.biz/raw/muznherhru", true))()
+    end
+})
+
+Tab_GB:Button({
+    ["Title"] = "2代",
+    ["Desc"] = "汉化脚本",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/whattfa/NONE/main/script.lua?token=GHSAT0AAAAAACNMQZ3V54Y44V4CERU2AGKUZQPYUXQ", true))()
+    end
+})
+
+-------------------------------------------------------------------------
+-- Tab: 伐木大亨2 (Lumber Tycoon 2)
+-------------------------------------------------------------------------
+local Tab_Lumber = Window:Tab({
+    ["Locked"] = false,
+    ["Title"] = "伐木大亨2",
+    ["Icon"] = "rbxassetid://98390883777058",
+})
+
+Tab_Lumber:Button({
+    ["Title"] = "伐木大亨2免费白脚本",
+    ["Desc"] = "白脚本",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/XiaoYunCN/Kavo-Ui/main/%E4%BC%90%E6%9C%A8%E5%A4%A7%E4%BA%A82.lua", true))()
+    end
+})
+
+-------------------------------------------------------------------------
+-- Tab: 脚本中心区 (Script Hub)
+-------------------------------------------------------------------------
+local Tab_Hub = Window:Tab({
+    ["Locked"] = false,
+    ["Title"] = "脚本中心区",
+    ["Icon"] = "rbxassetid://14895392107",
+})
+
+Tab_Hub:Button({
+    ["Title"] = "黄某脚本",
+    ["Desc"] = "要卡密",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/xiaokong6/x1/refs/heads/main/黄某脚本加载器"))()
+    end
+})
+
+Tab_Hub:Button({
+    ["Title"] = "林脚本破解版",
+    ["Desc"] = "破解",
+    ["Callback"] = function()
+        getgenv().AL = "Advanced Logic团队破解"
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/longshu886/longscript/main/linpojie"))()
+    end
+})
+
+Tab_Hub:Button({
+    ["Title"] = "皮脚本",
+    ["Desc"] = "小皮",
+    ["Callback"] = function()
+        getgenv().XiaoPi = "皮脚本QQ群1002100032"
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/xiaopi77/xiaopi77/main/QQ1002100032-Roblox-Pi-script.lua"))()
+    end
+})
+
+Tab_Hub:Button({
+    ["Title"] = "叶脚本",
+    ["Desc"] = "小叶",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/roblox-ye/QQ515966991/refs/heads/main/ROBLOX-CNVIP-XIAOYE.lua"))()
+    end
+})
+
+Tab_Hub:Button({
+    ["Title"] = "通缉",
+    ["Desc"] = "凌乱",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://pandadevelopment.net/virtual/file/16201bc675d3184b"))()
+    end
+})
+
+Tab_Hub:Button({
+    ["Title"] = "黑白脚本",
+    ["Desc"] = "黑白脚本卡密",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/tfcygvunbind/Apple/main/黑白脚本加载器"))()
+    end
+})
+
+Tab_Hub:Button({
+    ["Title"] = "LM",
+    ["Desc"] = "卡密 卡密夏季八书",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("loadstring(game:HttpGet("\104\116\116\112\115\58\47\47\114\97\119\46\103\105\116\104\117\98\117\115\101\114\99\111\110\116\101\110\116\46\99\111\109\47\108\105\117\108\105\117\113\105\97\110\103\52\48\52\45\99\111\100\101\47\54\47\114\101\102\115\47\104\101\97\100\115\47\109\97\105\110\47\229\136\152\230\159\144\232\132\154\230\156\172\229\138\160\232\189\189\229\153\168\44"))()"))()
+    end
+})
+
+Tab_Hub:Button({
+    ["Title"] = "云脚本测试版",
+    ["Desc"] = "不免费",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://github.com/CloudX-ScriptsWane/White-ash-script/raw/main/Beta.lua", true))()
+    end
+})
+
+Tab_Hub:Button({
+    ["Title"] = "WTB脚本",
+    ["Desc"] = "要解卡有汉化",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/S-WTB/-/refs/heads/main/WTB加载器"))()
+    end
+})
+
+-------------------------------------------------------------------------
+-- Tab: 在披萨店工作 (Work at a Pizza Place)
+-------------------------------------------------------------------------
+local Tab_Pizza = Window:Tab({
+    ["Locked"] = false,
+    ["Title"] = "在披萨店工作",
+    ["Icon"] = "rbxassetid://15440802720",
+})
+
+Tab_Pizza:Button({
+    ["Title"] = "在披萨店工作厨房大暴动",
+    ["Desc"] = "炸房",
+    ["Callback"] = function()
+        _G.cookroomfucker = true
+        
+        -- 核心逻辑：将所有供应盒移动到玩家当前位置
+        spawn(function()
+            while _G.cookroomfucker and wait() do
+                local boxParent = Workspace:FindFirstChild("AllSupplyBoxes")
+                if boxParent and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                    for _, box in pairs(boxParent:GetChildren()) do
+                        box.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame
+                    end
+                end
+            end
+        end)
+    end
+})
+
+Tab_Pizza:Button({
+    ["Title"] = "披萨店自动工作",
+    ["Desc"] = "赚钱必用",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/114514lzkill/pass/refs/heads/main/%E6%8A%AB%E8%90%A8%E5%BA%97%E8%87%AA%E5%8A%A8%E5%B7%A5%E4%BD%9C.lua"))()
+    end
+})
+
+-------------------------------------------------------------------------
+-- Tab: 自然灾害 (Natural Disaster Survival)
+-------------------------------------------------------------------------
+local Tab_Natural = Window:Tab({
+    ["Locked"] = false,
+    ["Title"] = "自然灾害",
+    ["Icon"] = "rbxassetid://8025358638",
+})
+
+Tab_Natural:Button({
+    ["Title"] = "自然灾害",
+    ["Desc"] = "不知道",
+    ["Callback"] = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/2dgeneralspam1/scripts-and-stuff/master/scripts/LoadstringUjHI6RQpz2o8", true))()
+    end
+})
+
+Tab_Natural:Button({
+    ["Title"] = "传送岛屿",
+    ["Desc"] = "我不保证能用",
+    ["Callback"] = function()
+        local function teleport()
+            if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(0, 60, 0)
+            end
+        end
+        teleport()
+        LocalPlayer.CharacterAdded:Connect(function(char)
+            char:WaitForChild("HumanoidRootPart")
+            teleport()
+        end)
+    end
+})
+
+Tab_Natural:Button({
+    ["Title"] = "传送出生点",
+    ["Desc"] = "我不保证能用",
+    ["Callback"] = function()
+        local function teleport()
+            if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(0, 10, 0)
+            end
+        end
+        teleport()
+        LocalPlayer.CharacterAdded:Connect(function(char)
+            char:WaitForChild("HumanoidRootPart")
+            teleport()
+        end)
+    end
+})
+
+
+local PlayerTab = Window:Tab({
+    Title = "本地玩家",
+    Icon = "user",
+    IconColor = Blue,
+    IconShape = "Square",
+    Border = true,
+})
+
+do
+    local InfiniteJumpEnabled = false
+    local JumpConnection = nil
+    
+    PlayerTab:Section({
+        Title = "主要功能",
+        TextSize = 16,
+        FontWeight = Enum.FontWeight.SemiBold,
+    })
+    
+    PlayerTab:Toggle({
+        Title = "无限跳跃",
+        Desc = "启用后可以无限跳跃",
+        Callback = function(enabled)
+            InfiniteJumpEnabled = enabled
+            if enabled then
+                if JumpConnection then
+                    JumpConnection:Disconnect()
+                end
+                JumpConnection = game:GetService("UserInputService").JumpRequest:Connect(function()
+                    local char = Players.LocalPlayer.Character
+                    if char and char:FindFirstChild("Humanoid") then
+                        char.Humanoid:ChangeState("Jumping")
+                    end
+                end)
+                WindUI:Notify({
+                    Title = "无限跳跃",
+                    Content = "已开启无限跳跃",
+                    Icon = "jump-rope",
+                })
+            else
+                if JumpConnection then
+                    JumpConnection:Disconnect()
+                    JumpConnection = nil
+                end
+                WindUI:Notify({
+                    Title = "无限跳跃",
+                    Content = "已关闭无限跳跃",
+                    Icon = "jump-rope",
+                })
+            end
+        end
+    })
+    
+    PlayerTab:Space()
+    
+    local originalGravity = workspace.Gravity
+    local GravityLoop = nil
+    
+    PlayerTab:Input({
+        Title = "设置重力",
+        Desc = "输入重力值 (默认:196" .. tostring(originalGravity) .. ")",
+        Placeholder = "输入重力值",
+        Callback = function(value)
+            local numValue = tonumber(value)
+            if numValue then
+                if GravityLoop then
+                    GravityLoop:Disconnect()
+                    GravityLoop = nil
+                end
+                
+                workspace.Gravity = numValue
+                WindUI:Notify({
+                    Title = "重力设置",
+                    Content = "重力已设置为: " .. tostring(numValue),
+                    Icon = "weight",
+                })
+            else
+                WindUI:Notify({
+                    Title = "错误来了",
+                    Content = "请输入数字",
+                    Icon = "alert-circle",
+                    Color = Red,
+                })
+            end
+        end
+    })
+    
+    PlayerTab:Space()
+    
+    local SpeedEnabled = false
+    local SpeedValue = 1
+    local SpeedConnection = nil
+    
+    PlayerTab:Input({
+        Title = "设置快速跑步速度",
+        Desc = "输入速度 (默认: 1)",
+        Placeholder = "输入速度",
+        Callback = function(value)
+            local numValue = tonumber(value)
+            if numValue then
+                SpeedValue = numValue
+                WindUI:Notify({
+                    Title = "速度设置",
+                    Content = "速度已设置为: " .. tostring(numValue) .. "速度",
+                    Icon = "zap",
+                })
+            else
+                WindUI:Notify({
+                    Title = "依旧错误来了",
+                    Content = "请输入有效数字",
+                    Icon = "alert-circle",
+                    Color = Red,
+                })
+            end
+        end
+    })
+    
+    PlayerTab:Toggle({
+        Title = "开启快速跑步",
+        Desc = "启用快速跑步功能",
+        Callback = function(enabled)
+            SpeedEnabled = enabled
+            if enabled then
+                if SpeedConnection then
+                    SpeedConnection:Disconnect()
+                end
+                SpeedConnection = game:GetService("RunService").Heartbeat:Connect(function()
+                    local player = Players.LocalPlayer
+                    local char = player.Character
+                    if char and char:FindFirstChild("Humanoid") then
+                        local humanoid = char.Humanoid
+                        if humanoid.MoveDirection.Magnitude > 0 then
+                            char:TranslateBy(humanoid.MoveDirection * SpeedValue / 2)
+                        end
+                    end
+                end)
+            else
+                if SpeedConnection then
+                    SpeedConnection:Disconnect()
+                    SpeedConnection = nil
+                end
+            end
+        end
+    })
+end
+
+
+print("shuai Hub加载完成")
