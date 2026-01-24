@@ -1,0 +1,592 @@
+local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/dist/main.lua"))()
+
+-- 美国子弹功能 - 优化版
+local workspace = game:GetService("Workspace")
+local players = game:GetService("Players")
+local runService = game:GetService("RunService")
+
+-- 美国子弹控制变量
+local aimbotEnabled = false
+local aimbotRange = 999
+local aimbotTargetCache = nil
+local aimbotCacheTime = 0
+local aimbotCacheInterval = 0.1 -- 缓存更新间隔（秒）
+
+-- 获取最近目标函数 - 优化版
+local function get_closest_target(range)
+    local currentTime = tick()
+    
+    -- 使用缓存机制减少计算量
+    if aimbotTargetCache and (currentTime - aimbotCacheTime) < aimbotCacheInterval then
+        return aimbotTargetCache
+    end
+    
+    local local_player = players.LocalPlayer
+    if not local_player then return nil end
+    
+    local camera = workspace.CurrentCamera
+    if not camera then return nil end
+    
+    local closest_part, closest_distance = nil, range
+    local viewportCenter = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
+    
+    for _, player in pairs(players:GetPlayers()) do
+        if player == local_player then goto continue end
+        
+        local character = player.Character
+        if not character then goto continue end
+        
+        local humanoid = character:FindFirstChild("Humanoid")
+        if not humanoid or humanoid.Health <= 0 then goto continue end
+        
+        local head = character:FindFirstChild("Head")
+        if not head then goto continue end
+        
+        local screen_position, on_screen = camera:WorldToViewportPoint(head.Position)
+        if not on_screen then goto continue end
+        
+        local distance = (Vector2.new(screen_position.X, screen_position.Y) - viewportCenter).Magnitude
+        if distance < closest_distance then
+            closest_part = head
+            closest_distance = distance
+        end
+        
+        ::continue::
+    end
+    
+    -- 更新缓存
+    aimbotTargetCache = closest_part
+    aimbotCacheTime = currentTime
+    
+    return closest_part
+end
+
+-- 设置美国子弹功能 - 优化版
+local function setupAimbot()
+    local success, bullet_handler = pcall(function()
+        return require(game:GetService("ReplicatedStorage").ModuleScripts.GunModules.BulletHandler)
+    end)
+    
+    if not success or not bullet_handler then
+        -- 尝试备用路径
+        local success2, bullet_handler2 = pcall(function()
+            return require(game:GetService("ReplicatedStorage").Modules.GunModules.BulletHandler)
+        end)
+        
+        if not success2 or not bullet_handler2 then
+            WindUI:Notify({
+                Title = "错误",
+                Content = "无法找到BulletHandler模块",
+                Duration = 3,
+                Icon = "x"
+            })
+            return false
+        end
+        bullet_handler = bullet_handler2
+    end
+    
+    local originalFire = bullet_handler.Fire
+    
+    bullet_handler.Fire = function(data)
+        if aimbotEnabled and data then
+            local closest = get_closest_target(aimbotRange)
+            if closest then
+                -- 使用缓存计算结果，避免重复计算
+                local direction = (closest.Position - data.Origin).Unit
+                data.Force = data.Force * 1000
+                data.Direction = direction
+            end
+        end
+        return originalFire(data)
+    end
+    
+    WindUI:Notify({
+        Title = "美国子弹",
+        Content = "初始化完成",
+        Duration = 2,
+        Icon = "check"
+    })
+    
+    return true
+end
+
+-- 切换美国子弹功能 - 优化版
+local function toggleAimbot(state)
+    aimbotEnabled = state
+    
+    if state then
+        -- 异步初始化，避免阻塞主线程
+        spawn(function()
+            local success = setupAimbot()
+            if success then
+                WindUI:Notify({
+                    Title = "美国子弹",
+                    Content = "功能已启用 (距离:500 " .. aimbotRange .. ")",
+                    Duration = 2,
+                    Icon = "crosshair"
+                })
+            else
+                aimbotEnabled = false
+                WindUI:Notify({
+                    Title = "美国子弹",
+                    Content = "启用失败，请重试",
+                    Duration = 2,
+                    Icon = "x"
+                })
+            end
+        end)
+    else
+        -- 清除缓存
+        aimbotTargetCache = nil
+        WindUI:Notify({
+            Title = "美国子弹",
+            Content = "功能已关闭",
+            Duration = 2,
+            Icon = "circle"
+        })
+    end
+end
+
+-- 原有UI变量
+local rainbowBorderAnimation
+local currentBorderColorScheme = "樱桃粉"
+local animationSpeed = 2
+local borderEnabled = true
+local borderInitialized = false
+local COLOR_SCHEMES = {
+    ["彩虹颜色"] = {ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHex("FF0000")),ColorSequenceKeypoint.new(0.16, Color3.fromHex("FFA500")),ColorSequenceKeypoint.new(0.33, Color3.fromHex("FFFF00")),ColorSequenceKeypoint.new(0.5, Color3.fromHex("00FF00")),ColorSequenceKeypoint.new(0.66, Color3.fromHex("0000FF")),ColorSequenceKeypoint.new(0.83, Color3.fromHex("4B0082")),ColorSequenceKeypoint.new(1, Color3.fromHex("EE82EE"))}),"palette"},
+    ["黑红颜色"] = {ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHex("000000")),ColorSequenceKeypoint.new(0.5, Color3.fromHex("FF0000")),ColorSequenceKeypoint.new(1, Color3.fromHex("000000"))}),"alert-triangle"},
+    ["蓝白颜色"] = {ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHex("FFFFFF")),ColorSequenceKeypoint.new(0.5, Color3.fromHex("1E90FF")),ColorSequenceKeypoint.new(1, Color3.fromHex("FFFFFF"))}),"droplet"},
+    ["紫金颜色"] = {ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHex("FFD700")),ColorSequenceKeypoint.new(0.5, Color3.fromHex("8A2BE2")),ColorSequenceKeypoint.new(1, Color3.fromHex("FFD700"))}),"crown"},
+    ["蓝黑颜色"] = {ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHex("000000")),ColorSequenceKeypoint.new(0.5, Color3.fromHex("0000FF")),ColorSequenceKeypoint.new(1, Color3.fromHex("000000"))}),"moon"},
+    ["绿紫颜色"] = {ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHex("00FF00")),ColorSequenceKeypoint.new(0.5, Color3.fromHex("800080")),ColorSequenceKeypoint.new(1, Color3.fromHex("00FF00"))}),"zap"},
+    ["粉蓝颜色"] = {ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHex("FF69B4")),ColorSequenceKeypoint.new(0.5, Color3.fromHex("00BFFF")),ColorSequenceKeypoint.new(1, Color3.fromHex("FF69B4"))}),"heart"},
+    ["橙青颜色"] = {ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHex("FF4500")),ColorSequenceKeypoint.new(0.5, Color3.fromHex("00CED1")),ColorSequenceKeypoint.new(1, Color3.fromHex("FF4500"))}),"sun"},
+    ["红金颜色"] = {ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHex("FF0000")),ColorSequenceKeypoint.new(0.5, Color3.fromHex("FFD700")),ColorSequenceKeypoint.new(1, Color3.fromHex("FF0000"))}),"award"},
+    ["银蓝颜色"] = {ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHex("C0C0C0")),ColorSequenceKeypoint.new(0.5, Color3.fromHex("4682B4")),ColorSequenceKeypoint.new(1, Color3.fromHex("C0C0C0"))}),"star"},
+    ["霓虹颜色"] = {ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHex("FF00FF")),ColorSequenceKeypoint.new(0.25, Color3.fromHex("00FFFF")),ColorSequenceKeypoint.new(0.5, Color3.fromHex("FFFF00")),ColorSequenceKeypoint.new(0.75, Color3.fromHex("FF00FF")),ColorSequenceKeypoint.new(1, Color3.fromHex("00FFFF"))}),"sparkles"},
+    ["森林颜色"] = {ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHex("228B22")),ColorSequenceKeypoint.new(0.5, Color3.fromHex("32CD32")),ColorSequenceKeypoint.new(1, Color3.fromHex("228B22"))}),"tree"},
+    ["火焰颜色"] = {ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHex("FF4500")),ColorSequenceKeypoint.new(0.5, Color3.fromHex("FF0000")),ColorSequenceKeypoint.new(1, Color3.fromHex("FF8C00"))}),"flame"},
+    ["海洋颜色"] = {ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHex("000080")),ColorSequenceKeypoint.new(0.5, Color3.fromHex("1E90FF")),ColorSequenceKeypoint.new(1, Color3.fromHex("00BFFF"))}),"waves"},
+    ["日落颜色"] = {ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHex("FF4500")),ColorSequenceKeypoint.new(0.5, Color3.fromHex("FF8C00")),ColorSequenceKeypoint.new(1, Color3.fromHex("FFD700"))}),"sunset"},
+    ["银河颜色"] = {ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHex("4B0082")),ColorSequenceKeypoint.new(0.5, Color3.fromHex("8A2BE2")),ColorSequenceKeypoint.new(1, Color3.fromHex("9370DB"))}),"galaxy"},
+    ["糖果颜色"] = {ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHex("FF69B4")),ColorSequenceKeypoint.new(0.5, Color3.fromHex("FF1493")),ColorSequenceKeypoint.new(1, Color3.fromHex("FFB6C1"))}),"candy"},
+    ["金属颜色"] = {ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHex("C0C0C0")),ColorSequenceKeypoint.new(0.5, Color3.fromHex("A9A9A9")),ColorSequenceKeypoint.new(1, Color3.fromHex("696969"))}),"shield"}
+}
+
+-- 边框相关函数
+local function createRainbowBorder(window, colorScheme, speed)
+    if not window or not window.UIElements then
+        wait(1)
+        if not window or not window.UIElements then
+            return nil, nil
+        end
+    end
+    
+    local mainFrame = window.UIElements.Main
+    if not mainFrame then
+        return nil, nil
+    end
+    
+    local existingStroke = mainFrame:FindFirstChild("RainbowStroke")
+    if existingStroke then
+        local glowEffect = existingStroke:FindFirstChild("GlowEffect")
+        if glowEffect then
+            local schemeData = COLOR_SCHEMES[colorScheme or currentBorderColorScheme]
+            if schemeData then
+                glowEffect.Color = schemeData[1]
+            end
+        end
+        return existingStroke, rainbowBorderAnimation
+    end
+    
+    if not mainFrame:FindFirstChildOfClass("UICorner") then
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, 16)
+        corner.Parent = mainFrame
+    end
+    
+    local rainbowStroke = Instance.new("UIStroke")
+    rainbowStroke.Name = "RainbowStroke"
+    rainbowStroke.Thickness = 1.5
+    rainbowStroke.Color = Color3.new(1, 1, 1)
+    rainbowStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    rainbowStroke.LineJoinMode = Enum.LineJoinMode.Round
+    rainbowStroke.Enabled = borderEnabled
+    rainbowStroke.Parent = mainFrame
+    
+    local glowEffect = Instance.new("UIGradient")
+    glowEffect.Name = "GlowEffect"
+    local schemeData = COLOR_SCHEMES[colorScheme or currentBorderColorScheme]
+    if schemeData then
+        glowEffect.Color = schemeData[1]
+    else
+        glowEffect.Color = COLOR_SCHEMES["彩虹颜色"][1]
+    end
+    glowEffect.Rotation = 0
+    glowEffect.Parent = rainbowStroke
+    
+    return rainbowStroke, nil
+end
+
+local function startBorderAnimation(window, speed)
+    if not window or not window.UIElements then
+        return nil
+    end
+    
+    local mainFrame = window.UIElements.Main
+    if not mainFrame then
+        return nil
+    end
+    
+    local rainbowStroke = mainFrame:FindFirstChild("RainbowStroke")
+    if not rainbowStroke or not rainbowStroke.Enabled then
+        return nil
+    end
+    
+    local glowEffect = rainbowStroke:FindFirstChild("GlowEffect")
+    if not glowEffect then
+        return nil
+    end
+    
+    if rainbowBorderAnimation then
+        rainbowBorderAnimation:Disconnect()
+        rainbowBorderAnimation = nil
+    end
+    
+    local lastTime = tick()
+    local animation
+    animation = runService.Heartbeat:Connect(function()
+        if not rainbowStroke or rainbowStroke.Parent == nil or not rainbowStroke.Enabled then
+            animation:Disconnect()
+            return
+        end
+        
+        local currentTime = tick()
+        local deltaTime = currentTime - lastTime
+        lastTime = currentTime
+        
+        glowEffect.Rotation = (glowEffect.Rotation + speed * deltaTime * 60) % 360
+    end)
+    
+    rainbowBorderAnimation = animation
+    return animation
+end
+
+local function initializeRainbowBorder(scheme, speed)
+    speed = speed or animationSpeed
+    local rainbowStroke, _ = createRainbowBorder(Window, scheme, speed)
+    if rainbowStroke then
+        if borderEnabled then
+            startBorderAnimation(Window, speed)
+        end
+        borderInitialized = true
+        return true
+    end
+    return false
+end
+
+local function playSound()
+    pcall(function()
+        local sound = Instance.new("Sound")
+        sound.SoundId = "rbxassetid://9047002353"
+        sound.Volume = 0.3
+        sound.Parent = game:GetService("SoundService")
+        sound:Play()
+        game:GetService("Debris"):AddItem(sound, 2)
+    end)
+end
+
+-- 创建主窗口
+local Window = WindUI:CreateWindow({
+    Title = "XS HUB",
+    Icon = "https://raw.githubusercontent.com/tnine-n9/tnine_Hub/refs/heads/main/retouch_2026012321291407.png",
+    IconTransparency = 0.5,
+    IconThemed = true,
+    Author = "messy",
+    Folder = "XS HUB",
+    Size = UDim2.fromOffset(580, 200),
+    Transparent = true,
+    Theme = "Dark",
+    User = {
+        Enabled = true,
+        Callback = function() end,
+        Anonymous = false
+    },
+    Background = "https://raw.githubusercontent.com/tnine-n9/tnine_Hub/refs/heads/main/IMG_20260124_003456.jpg"
+})
+
+spawn(function()
+    wait(0.5)
+    initializeRainbowBorder("彩虹颜色", animationSpeed)
+end)
+
+Window:Tag({
+    Title = "TnineHub附属",
+    Color = Color3.fromHex("#FFA500")
+})
+
+Window:Tag({
+    Title = "XS HUB",
+    Color = Color3.fromHex("#FF5F00")
+})
+
+local TimeTag = Window:Tag({
+    Title = "messy",
+    Color = Color3.fromHex("#FF8C00")
+})
+
+WindUI:Notify({
+    Title = "XS HUB 加载完成",
+    Content = "美国子弹功能准备就绪",
+    Duration = 3,
+    Icon = "zap",
+})
+
+-- 边框设置选项卡
+local SettingsTab = Window:Tab({
+    Title = "边框设置",
+    Icon = "palette",
+    Locked = false,
+})
+
+SettingsTab:Toggle({
+    Title = "启用边框",
+    Desc = "开关霓虹灯边框效果",
+    Default = borderEnabled,
+    Callback = function(value)
+        borderEnabled = value
+        local mainFrame = Window.UIElements and Window.UIElements.Main
+        if mainFrame then
+            local rainbowStroke = mainFrame:FindFirstChild("RainbowStroke")
+            if rainbowStroke then
+                rainbowStroke.Enabled = value
+                if value and not rainbowBorderAnimation then
+                    startBorderAnimation(Window, animationSpeed)
+                elseif not value and rainbowBorderAnimation then
+                    rainbowBorderAnimation:Disconnect()
+                    rainbowBorderAnimation = nil
+                end
+                WindUI:Notify({
+                    Title = "边框",
+                    Content = value and "已启用" or "已禁用",
+                    Duration = 2,
+                    Icon = value and "eye" or "eye-off"
+                })
+            end
+        end
+    end
+})
+
+local colorSchemeNames = {}
+for name, _ in pairs(COLOR_SCHEMES) do
+    table.insert(colorSchemeNames, name)
+end
+table.sort(colorSchemeNames)
+
+SettingsTab:Dropdown({
+    Title = "边框颜色",
+    Desc = "选择喜欢的颜色组合",
+    Values = colorSchemeNames,
+    Value = "彩虹颜色",
+    Callback = function(value)
+        currentBorderColorScheme = value
+        local success = initializeRainbowBorder(value, animationSpeed)
+        playSound()
+    end
+})
+
+SettingsTab:Slider({
+    Title = "边框转动速度",
+    Desc = "调整边框旋转的快慢",
+    Value = {
+        Min = 1,
+        Max = 10,
+        Default = 5,
+    },
+    Callback = function(value)
+        animationSpeed = value
+        if rainbowBorderAnimation then
+            rainbowBorderAnimation:Disconnect()
+            rainbowBorderAnimation = nil
+        end
+        if borderEnabled then
+            startBorderAnimation(Window, animationSpeed)
+        end
+        playSound()
+    end
+})
+
+SettingsTab:Slider({
+    Title = "边框粗细",
+    Desc = "调整边框的粗细",
+    Value = {
+        Min = 1,
+        Max = 5,
+        Default = 1.5,
+    },
+    Step = 0.5,
+    Callback = function(value)
+        local mainFrame = Window.UIElements and Window.UIElements.Main
+        if mainFrame then
+            local rainbowStroke = mainFrame:FindFirstChild("RainbowStroke")
+            if rainbowStroke then
+                rainbowStroke.Thickness = value
+            end
+        end
+        playSound()
+    end
+})
+
+SettingsTab:Slider({
+    Title = "圆角大小",
+    Desc = "调整UI圆角的大小",
+    Value = {
+        Min = 0,
+        Max = 20,
+        Default = 16,
+    },
+    Callback = function(value)
+        local mainFrame = Window.UIElements and Window.UIElements.Main
+        if mainFrame then
+            local corner = mainFrame:FindFirstChildOfClass("UICorner")
+            if not corner then
+                corner = Instance.new("UICorner")
+                corner.Parent = mainFrame
+            end
+            corner.CornerRadius = UDim.new(0, value)
+        end
+        playSound()
+    end
+})
+
+SettingsTab:Button({
+    Title = "随机颜色",
+    Icon = "palette",
+    Callback = function()
+        local randomColor = colorSchemeNames[math.random(1, #colorSchemeNames)]
+        currentBorderColorScheme = randomColor
+        initializeRainbowBorder(randomColor, animationSpeed)
+        playSound()
+    end
+})
+
+-- 主功能选项卡 - 美国子弹功能
+local MainTab = Window:Tab({
+    Title = "主功能",
+    Icon = "settings",
+    Locked = false,
+})
+
+-- 美国子弹控制
+MainTab:Toggle({
+    Title = "美国子弹",
+    Desc = "开启/关闭美国子弹功能",
+    Default = aimbotEnabled,
+    Callback = function(value)
+        toggleAimbot(value)
+        playSound()
+    end
+})
+
+MainTab:Slider({
+    Title = "子弹范围",
+    Desc = "设置美国子弹的瞄准范围",
+    Value = {
+        Min = 50,
+        Max = 2000,
+        Default = aimbotRange,
+    },
+    Callback = function(value)
+        aimbotRange = value
+        -- 清除缓存，因为范围改变了
+        aimbotTargetCache = nil
+        
+        if aimbotEnabled then
+            WindUI:Notify({
+                Title = "美国子弹",
+                Content = "范围已更新: " .. value,
+                Duration = 2,
+                Icon = "maximize-2"
+            })
+        end
+        playSound()
+    end
+})
+
+MainTab:Button({
+    Title = "测试子弹",
+    Desc = "测试美国子弹功能",
+    Callback = function()
+        if aimbotEnabled then
+            local target = get_closest_target(aimbotRange)
+            if target then
+                WindUI:Notify({
+                    Title = "美国子弹测试",
+                    Content = "目标锁定成功，距离: " .. math.floor((target.Position - workspace.CurrentCamera.CFrame.Position).Magnitude),
+                    Duration = 3,
+                    Icon = "target"
+                })
+            else
+                WindUI:Notify({
+                    Title = "美国子弹测试",
+                    Content = "未找到有效目标",
+                    Duration = 3,
+                    Icon = "eye-off"
+                })
+            end
+        else
+            WindUI:Notify({
+                Title = "美国子弹测试",
+                Content = "请先开启美国子弹功能",
+                Duration = 3,
+                Icon = "x"
+            })
+        end
+        playSound()
+    end
+})
+
+-- 性能优化设置
+MainTab:Slider({
+    Title = "缓存间隔",
+    Desc = "调整目标缓存更新时间（毫秒）",
+    Value = {
+        Min = 50,
+        Max = 500,
+        Default = 100,
+    },
+    Callback = function(value)
+        aimbotCacheInterval = value / 1000  -- 转换为秒
+        WindUI:Notify({
+            Title = "性能设置",
+            Content = "缓存间隔已设置为: " .. value .. "ms",
+            Duration = 2,
+            Icon = "zap"
+        })
+        playSound()
+    end
+})
+
+-- 窗口关闭时的清理
+Window:OnClose(function()
+    if rainbowBorderAnimation then
+        rainbowBorderAnimation:Disconnect()
+        rainbowBorderAnimation = nil
+    end
+end)
+
+Window:OnDestroy(function()
+    if rainbowBorderAnimation then
+        rainbowBorderAnimation:Disconnect()
+        rainbowBorderAnimation = nil
+    end
+end)
+
+-- 预加载美国子弹模块（减少首次启用延迟）
+spawn(function()
+    wait(2)
+    pcall(function()
+        require(game:GetService("ReplicatedStorage").ModuleScripts.GunModules.BulletHandler)
+    end)
+end)
