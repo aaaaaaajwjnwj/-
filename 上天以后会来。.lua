@@ -81,7 +81,7 @@ ESP.AddFolder("HunterESPFolder")
 ESP.AddFolder("GlassESPFolder")
 
 local WindUISuccess, WindUI = pcall(function()
-    return loadstring(game:HttpGet("https://pandadevelopment.net/virtual/file/be72acd65379b42a"))()
+    return loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/dist/main.lua"))()
 end)
 
 if not WindUISuccess then
