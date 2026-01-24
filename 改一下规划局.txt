@@ -1,0 +1,740 @@
+-- XS 枢纽 | 射击游戏
+-- 流畅帧率脚本 搭配 Luna 界面
+ 
+local Luna = loadstring(game:HttpGet("https://raw.githubusercontent.com/Nebula-Softworks/Luna-Interface-Suite/main/source.lua"))()
+ 
+local Window = Luna:CreateWindow({
+Name = "XS 枢纽 | 射击游戏",
+LoadingTitle = "XS 枢纽",
+LoadingSubtitle = "作者：Xenure",
+ConfigurationSaving = {
+Enabled = true,
+FolderName = "XenureHub",
+FileName = "射击游戏配置"
+},
+Discord = {
+Enabled = false,
+Invite = "",
+RememberJoins = false
+},
+KeySystem = false
+})
+ 
+-- 服务
+local 玩家服务 = game:GetService("Players")
+local 运行服务 = game:GetService("RunService")
+local 输入服务 = game:GetService("UserInputService")
+local 摄像机 = workspace.CurrentCamera
+local 本地玩家 = 玩家服务.LocalPlayer
+ 
+-- 变量
+local 锁敌开启 = false
+local 自瞄开启 = false
+local 平滑瞄准 = false
+local 瞄准部位 = "头部"
+local 视野圈开启 = false
+local 视野圈大小 = 100
+local 视野圈 = nil
+local 平滑度 = 0.4
+local 穿墙检测 = true
+local 目标玩家 = nil
+ 
+local 玩家透视开启 = false
+local 透视框体 = {}
+local 透视名称 = {}
+local 透视血量 = {}
+local 透视距离 = {}
+local 透视对象 = {}
+ 
+local 穿墙透视开启 = false
+local 原始透明度 = {}
+ 
+local 无限跳跃开启 = false
+local 无限跳跃连接 = nil
+ 
+-- 创建视野圈
+local function 创建视野圈()
+if 视野圈 then 视野圈:Remove() end
+视野圈 = Drawing.new("Circle")
+视野圈.Thickness = 2
+视野圈.NumSides = 50
+视野圈.Radius = 视野圈大小
+视野圈.Filled = false
+视野圈.Transparency = 1
+视野圈.Color = Color3.fromRGB(255, 255, 255)
+视野圈.Visible = false
+视野圈.ZIndex = 2
+end
+ 
+-- 更新视野圈
+local function 更新视野圈()
+if 视野圈 then
+local 中心X = 摄像机.ViewportSize.X / 2
+local 中心Y = 摄像机.ViewportSize.Y / 2
+视野圈.Position = Vector2.new(中心X, 中心Y)
+视野圈.Radius = 视野圈大小
+视野圈.Visible = 视野圈开启 and (锁敌开启 or 自瞄开启)
+end
+end
+ 
+-- 获取准星最近玩家
+local function 获取准星最近玩家()
+local 最近玩家 = nil
+local 最短距离 = 视野圈开启 and 视野圈大小 or math.huge
+local 鼠标位置 = 输入服务:GetMouseLocation()
+ 
+for _, 玩家 in pairs(玩家服务:GetPlayers()) do
+if 玩家 ~= 本地玩家 and 玩家.Character and 玩家.Character:FindFirstChild("人形根部件") then
+local 人形对象 = 玩家.Character:FindFirstChild("人形对象")
+if 人形对象 and 人形对象.Health > 0 then
+local 目标部位 = 玩家.Character:FindFirstChild(瞄准部位)
+if 目标部位 then
+local 屏幕位置, 屏幕可见 = 摄像机:WorldToViewportPoint(目标部位.Position)
+ 
+if 屏幕可见 then
+local 距离 = (Vector2.new(屏幕位置.X, 屏幕位置.Y) - 鼠标位置).Magnitude
+ 
+if 穿墙检测 then
+local 射线 = Ray.new(摄像机.CFrame.Position, (目标部位.Position - 摄像机.CFrame.Position).Unit * 1000)
+local 命中部位, 命中位置 = workspace:FindPartOnRayWithIgnoreList(射线, {本地玩家.Character})
+ 
+if 命中部位 and 命中部位:IsDescendantOf(玩家.Character) then
+if 距离 < 最短距离 then
+最近玩家 = 玩家
+最短距离 = 距离
+end
+end
+else
+if 距离 < 最短距离 then
+最近玩家 = 玩家
+最短距离 = 距离
+end
+end
+end
+end
+end
+end
+end
+ 
+return 最近玩家
+end
+ 
+-- 锁敌功能
+local function 锁敌()
+if not 锁敌开启 then return end
+ 
+local 目标 = 获取准星最近玩家()
+if 目标 and 目标.Character then
+local 目标部位 = 目标.Character:FindFirstChild(瞄准部位)
+if 目标部位 then
+local 瞄准位置 = 目标部位.Position
+local 摄像机位置 = 摄像机.CFrame.Position
+local 瞄准方向 = (瞄准位置 - 摄像机位置).Unit
+ 
+if 平滑瞄准 then
+local 目标视角 = CFrame.new(摄像机位置, 摄像机位置 + 瞄准方向)
+摄像机.CFrame = 摄像机.CFrame:Lerp(目标视角, 平滑度)
+else
+摄像机.CFrame = CFrame.new(摄像机位置, 摄像机位置 + 瞄准方向)
+end
+end
+end
+end
+ 
+-- 自瞄功能（静默自瞄）
+local function 自瞄()
+if not 自瞄开启 then return end
+ 
+local 目标 = 获取准星最近玩家()
+if 目标 then
+目标玩家 = 目标
+else
+目标玩家 = nil
+end
+end
+ 
+-- 透视功能（增强视觉效果）
+local 透视对象 = {}
+ 
+local function 创建透视(玩家)
+if 透视对象[玩家] or 玩家 == 本地玩家 then return end
+ 
+local 透视容器 = {
+框体 = Drawing.new("Square"),
+框体外描边 = Drawing.new("Square"),
+左上角角标 = Drawing.new("Line"),
+右上角角标 = Drawing.new("Line"),
+左下角角标 = Drawing.new("Line"),
+右下角角标 = Drawing.new("Line"),
+追踪线 = Drawing.new("Line"),
+名称 = Drawing.new("Text"),
+距离 = Drawing.new("Text"),
+血量 = Drawing.new("Text"),
+血条 = Drawing.new("Line"),
+血条外描边 = Drawing.new("Line")
+}
+ 
+-- 主框体
+透视容器.框体.Thickness = 2
+透视容器.框体.Filled = false
+透视容器.框体.Color = Color3.fromRGB(255, 0, 0)
+透视容器.框体.Visible = false
+透视容器.框体.ZIndex = 2
+透视容器.框体.Transparency = 1
+ 
+-- 框体外描边（立体效果）
+透视容器.框体外描边.Thickness = 4
+透视容器.框体外描边.Filled = false
+透视容器.框体外描边.Color = Color3.fromRGB(0, 0, 0)
+透视容器.框体外描边.Visible = false
+透视容器.框体外描边.ZIndex = 1
+透视容器.框体外描边.Transparency = 0.8
+ 
+-- 角标线条（精致角标）
+for _, 角标 in pairs({透视容器.左上角角标, 透视容器.右上角角标, 透视容器.左下角角标, 透视容器.右下角角标}) do
+角标.Thickness = 3
+角标.Color = Color3.fromRGB(255, 255, 255)
+角标.Visible = false
+角标.ZIndex = 3
+角标.Transparency = 1
+end
+ 
+-- 追踪线
+透视容器.追踪线.Thickness = 2
+透视容器.追踪线.Color = Color3.fromRGB(255, 0, 0)
+透视容器.追踪线.Visible = false
+透视容器.追踪线.ZIndex = 1
+透视容器.追踪线.Transparency = 0.5
+ 
+-- 名称文本
+透视容器.名称.Size = 16
+透视容器.名称.Center = true
+透视容器.名称.Outline = true
+透视容器.名称.Font = 3
+透视容器.名称.Color = Color3.fromRGB(255, 255, 255)
+透视容器.名称.Visible = false
+透视容器.名称.ZIndex = 3
+透视容器.名称.Transparency = 1
+ 
+-- 距离文本
+透视容器.距离.Size = 13
+透视容器.距离.Center = true
+透视容器.距离.Outline = true
+透视容器.距离.Font = 2
+透视容器.距离.Color = Color3.fromRGB(200, 200, 255)
+透视容器.距离.Visible = false
+透视容器.距离.ZIndex = 3
+透视容器.距离.Transparency = 1
+ 
+-- 血量文本
+透视容器.血量.Size = 13
+透视容器.血量.Center = true
+透视容器.血量.Outline = true
+透视容器.血量.Font = 2
+透视容器.血量.Color = Color3.fromRGB(0, 255, 0)
+透视容器.血量.Visible = false
+透视容器.血量.ZIndex = 3
+透视容器.血量.Transparency = 1
+ 
+-- 血条
+透视容器.血条.Thickness = 3
+透视容器.血条.Color = Color3.fromRGB(0, 255, 0)
+透视容器.血条.Visible = false
+透视容器.血条.ZIndex = 3
+透视容器.血条.Transparency = 1
+ 
+-- 血条外描边
+透视容器.血条外描边.Thickness = 5
+透视容器.血条外描边.Color = Color3.fromRGB(0, 0, 0)
+透视容器.血条外描边.Visible = false
+透视容器.血条外描边.ZIndex = 2
+透视容器.血条外描边.Transparency = 0.8
+ 
+透视对象[玩家] = 透视容器
+end
+ 
+local function 移除透视(玩家)
+if 透视对象[玩家] then
+for _, 绘制对象 in pairs(透视对象[玩家]) do
+绘制对象:Remove()
+end
+透视对象[玩家] = nil
+end
+end
+ 
+local function 更新透视()
+for 玩家, 透视 in pairs(透视对象) do
+pcall(function()
+if 玩家 and 玩家.Character and 玩家 ~= 本地玩家 then
+local 角色模型 = 玩家.Character
+local 人形对象 = 角色模型:FindFirstChildOfClass("人形对象")
+local 人形根部件 = 角色模型:FindFirstChild("人形根部件")
+local 头部 = 角色模型:FindFirstChild("头部")
+ 
+if 人形对象 and 人形根部件 and 头部 and 人形对象.Health > 0 and 本地玩家.Character and 本地玩家.Character:FindFirstChild("人形根部件") then
+local 距离 = (本地玩家.Character.人形根部件.Position - 人形根部件.Position).Magnitude
+ 
+if 距离 > 5000 then
+透视.框体.Visible = false
+透视.框体外描边.Visible = false
+透视.左上角角标.Visible = false
+透视.右上角角标.Visible = false
+透视.左下角角标.Visible = false
+透视.右下角角标.Visible = false
+透视.追踪线.Visible = false
+透视.名称.Visible = false
+透视.距离.Visible = false
+透视.血量.Visible = false
+透视.血条.Visible = false
+透视.血条外描边.Visible = false
+return
+end
+ 
+local 向量位置, 屏幕可见 = 摄像机:WorldToViewportPoint(人形根部件.Position)
+ 
+if 屏幕可见 and 玩家透视开启 then
+local 头部位置 = 摄像机:WorldToViewportPoint(头部.Position + Vector3.new(0, 0.5, 0))
+local 脚部位置 = 摄像机:WorldToViewportPoint(人形根部件.Position - Vector3.new(0, 3, 0))
+ 
+local 框体高度 = math.abs(头部位置.Y - 脚部位置.Y)
+local 框体宽度 = 框体高度 / 2
+ 
+local 是否为目标 = (目标玩家 == 玩家)
+local 框体颜色 = 是否为目标 and Color3.fromRGB(0, 255, 100) or Color3.fromRGB(255, 50, 50)
+ 
+-- 锁定目标脉冲效果
+if 是否为目标 then
+local 脉冲值 = math.abs(math.sin(tick() * 3)) * 0.3 + 0.7
+框体颜色 = Color3.fromRGB(0, 255 * 脉冲值, 100)
+end
+ 
+-- 主框体
+透视.框体.Size = Vector2.new(框体宽度, 框体高度)
+透视.框体.Position = Vector2.new(向量位置.X - 框体宽度 / 2, 向量位置.Y - 框体高度 / 2)
+透视.框体.Color = 框体颜色
+透视.框体.Visible = true
+ 
+-- 框体外描边
+透视.框体外描边.Size = Vector2.new(框体宽度, 框体高度)
+透视.框体外描边.Position = Vector2.new(向量位置.X - 框体宽度 / 2, 向量位置.Y - 框体高度 / 2)
+透视.框体外描边.Visible = true
+ 
+-- 精致角标线条
+local 角标长度 = math.min(框体宽度, 框体高度) / 4
+ 
+-- 左上角
+透视.左上角角标.From = Vector2.new(向量位置.X - 框体宽度 / 2, 向量位置.Y - 框体高度 / 2)
+透视.左上角角标.To = Vector2.new(向量位置.X - 框体宽度 / 2 + 角标长度, 向量位置.Y - 框体高度 / 2)
+透视.左上角角标.Color = 框体颜色
+透视.左上角角标.Visible = true
+ 
+-- 右上角
+透视.右上角角标.From = Vector2.new(向量位置.X + 框体宽度 / 2, 向量位置.Y - 框体高度 / 2)
+透视.右上角角标.To = Vector2.new(向量位置.X + 框体宽度 / 2 - 角标长度, 向量位置.Y - 框体高度 / 2)
+透视.右上角角标.Color = 框体颜色
+透视.右上角角标.Visible = true
+ 
+-- 左下角
+透视.左下角角标.From = Vector2.new(向量位置.X - 框体宽度 / 2, 向量位置.Y + 框体高度 / 2)
+透视.左下角角标.To = Vector2.new(向量位置.X - 框体宽度 / 2 + 角标长度, 向量位置.Y + 框体高度 / 2)
+透视.左下角角标.Color = 框体颜色
+透视.左下角角标.Visible = true
+ 
+-- 右下角
+透视.右下角角标.From = Vector2.new(向量位置.X + 框体宽度 / 2, 向量位置.Y + 框体高度 / 2)
+透视.右下角角标.To = Vector2.new(向量位置.X + 框体宽度 / 2 - 角标长度, 向量位置.Y + 框体高度 / 2)
+透视.右下角角标.Color = 框体颜色
+透视.右下角角标.Visible = true
+ 
+-- 追踪线（默认关闭，视觉更简洁）
+透视.追踪线.Visible = false
+ 
+-- 名称发光效果
+透视.名称.Text = 玩家.Name .. (是否为目标 and " ⚡ [已锁定]" or "")
+透视.名称.Position = Vector2.new(向量位置.X, 头部位置.Y - 25)
+透视.名称.Color = 是否为目标 and Color3.fromRGB(100, 255, 150) or Color3.fromRGB(255, 255, 255)
+透视.名称.Visible = true
+ 
+-- 距离渐变颜色（按距离区分）
+local 距离颜色 = 距离 < 100 and Color3.fromRGB(255, 100, 100) or
+距离 < 300 and Color3.fromRGB(255, 255, 100) or
+Color3.fromRGB(100, 200, 255)
+透视.距离.Text = math.floor(距离) .. "米"
+透视.距离.Position = Vector2.new(向量位置.X, 脚部位置.Y + 5)
+透视.距离.Color = 距离颜色
+透视.距离.Visible = true
+ 
+-- 血量平滑渐变色
+local 血量百分比 = math.floor((人形对象.Health / 人形对象.MaxHealth) * 100)
+透视.血量.Text = 血量百分比 .. "❤"
+透视.血量.Position = Vector2.new(向量位置.X, 脚部位置.Y + 20)
+ 
+-- 血量RGB平滑渐变
+if 血量百分比 > 75 then
+透视.血量.Color = Color3.fromRGB(0, 255, 100)
+elseif 血量百分比 > 50 then
+透视.血量.Color = Color3.fromRGB(255, 255, 0)
+elseif 血量百分比 > 25 then
+透视.血量.Color = Color3.fromRGB(255, 150, 0)
+else
+透视.血量.Color = Color3.fromRGB(255, 0, 0)
+end
+透视.血量.Visible = true
+ 
+-- 血条（框体侧边）
+local 血条高度 = 框体高度 * (人形对象.Health / 人形对象.MaxHealth)
+local 血条X坐标 = 向量位置.X - 框体宽度 / 2 - 7
+ 
+透视.血条外描边.From = Vector2.new(血条X坐标, 向量位置.Y - 框体高度 / 2)
+透视.血条外描边.To = Vector2.new(血条X坐标, 向量位置.Y + 框体高度 / 2)
+透视.血条外描边.Visible = true
+ 
+透视.血条.From = Vector2.new(血条X坐标, 向量位置.Y + 框体高度 / 2)
+透视.血条.To = Vector2.new(血条X坐标, 向量位置.Y + 框体高度 / 2 - 血条高度)
+透视.血条.Color = 透视.血量.Color
+透视.血条.Visible = true
+else
+透视.框体.Visible = false
+透视.框体外描边.Visible = false
+透视.左上角角标.Visible = false
+透视.右上角角标.Visible = false
+透视.左下角角标.Visible = false
+透视.右下角角标.Visible = false
+透视.追踪线.Visible = false
+透视.名称.Visible = false
+透视.距离.Visible = false
+透视.血量.Visible = false
+透视.血条.Visible = false
+透视.血条外描边.Visible = false
+end
+else
+透视.框体.Visible = false
+透视.框体外描边.Visible = false
+透视.左上角角标.Visible = false
+透视.右上角角标.Visible = false
+透视.左下角角标.Visible = false
+透视.右下角角标.Visible = false
+透视.追踪线.Visible = false
+透视.名称.Visible = false
+透视.距离.Visible = false
+透视.血量.Visible = false
+透视.血条.Visible = false
+透视.血条外描边.Visible = false
+end
+end
+end)
+end
+end
+ 
+-- 穿墙透视功能
+local function 开关穿墙透视(开启状态)
+if 开启状态 then
+for _, 对象 in pairs(workspace:GetDescendants()) do
+if 对象:IsA("基础部件") and not 对象:IsDescendantOf(本地玩家.Character) then
+原始透明度[对象] = 对象.Transparency
+对象.Transparency = 0.7
+end
+end
+else
+for 对象, 透明度 in pairs(原始透明度) do
+if 对象 and 对象.Parent then
+对象.Transparency = 透明度
+end
+end
+原始透明度 = {}
+end
+end
+ 
+-- 无限跳跃功能
+local function 开关无限跳跃(开启状态)
+if 开启状态 then
+无限跳跃连接 = 输入服务.JumpRequest:Connect(function()
+if 本地玩家.Character and 本地玩家.Character:FindFirstChildOfClass("人形对象") then
+本地玩家.Character:FindFirstChildOfClass("人形对象"):ChangeState(Enum.HumanoidStateType.Jumping)
+end
+end)
+else
+if 无限跳跃连接 then
+无限跳跃连接:Disconnect()
+无限跳跃连接 = nil
+end
+end
+end
+ 
+-- 创建主页标签（Luna 必需）
+Window:CreateHomeTab({
+SupportedExecutors = {
+"Synapse X", "Krnl", "Fluxus", "Script-Ware",
+"Electron", "Solara", "Wave", "Delta", "Xeno"
+},
+DiscordInvite = nil,
+Icon = 1
+})
+ 
+-- 创建功能标签页
+local 战斗标签页 = Window:CreateTab({
+Name = "战斗",
+Icon = "gps_fixed",
+ImageSource = "Material",
+ShowTitle = true
+})
+ 
+local 视觉标签页 = Window:CreateTab({
+Name = "视觉",
+Icon = "visibility",
+ImageSource = "Material",
+ShowTitle = true
+})
+ 
+local 杂项标签页 = Window:CreateTab({
+Name = "杂项",
+Icon = "more_horiz",
+ImageSource = "Material",
+ShowTitle = true
+})
+ 
+local 设置标签页 = Window:CreateTab({
+Name = "设置",
+Icon = "settings",
+ImageSource = "Material",
+ShowTitle = true
+})
+ 
+-- 战斗板块
+local 锁敌板块 = 战斗标签页:CreateSection("锁敌")
+ 
+local 锁敌开关 = 战斗标签页:CreateToggle({
+Name = "开启锁敌",
+CurrentValue = false,
+Flag = "AimlockToggle",
+Callback = function(开关状态)
+锁敌开启 = 开关状态
+创建视野圈()
+end,
+})
+ 
+local 平滑瞄准开关 = 战斗标签页:CreateToggle({
+Name = "平滑瞄准",
+CurrentValue = false,
+Flag = "SmoothAimToggle",
+Callback = function(开关状态)
+平滑瞄准 = 开关状态
+end,
+})
+ 
+local 平滑度滑块 = 战斗标签页:CreateSlider({
+Name = "平滑度",
+Range = {0.1, 1},
+Increment = 0.05,
+CurrentValue = 0.4,
+Flag = "SmoothnessSlider",
+Callback = function(数值)
+平滑度 = 数值
+end,
+})
+ 
+local 穿墙检测开关 = 战斗标签页:CreateToggle({
+Name = "穿墙检测",
+CurrentValue = true,
+Flag = "WallCheckToggle",
+Callback = function(开关状态)
+穿墙检测 = 开关状态
+end,
+})
+ 
+local 瞄准部位下拉框 = 战斗标签页:CreateDropdown({
+Name = "目标部位",
+Options = {"头部", "上躯干", "下躯干", "人形根部件"},
+CurrentOption = {"头部"},
+MultipleOptions = false,
+Flag = "AimPartDropdown",
+Callback = function(选项)
+if type(选项) == "table" then
+瞄准部位 = 选项[1]
+else
+瞄准部位 = 选项
+end
+end,
+})
+ 
+local 视野圈板块 = 战斗标签页:CreateSection("视野圈")
+ 
+local 视野圈开关 = 战斗标签页:CreateToggle({
+Name = "开启视野圈",
+CurrentValue = false,
+Flag = "FOVToggle",
+Callback = function(开关状态)
+视野圈开启 = 开关状态
+创建视野圈()
+end,
+})
+ 
+local 视野圈大小滑块 = 战斗标签页:CreateSlider({
+Name = "视野圈大小",
+Range = {50, 500},
+Increment = 10,
+CurrentValue = 100,
+Flag = "FOVSlider",
+Callback = function(数值)
+视野圈大小 = 数值
+if 视野圈 then
+视野圈.Radius = 数值
+end
+end,
+})
+ 
+local 视野圈颜色选择器 = 战斗标签页:CreateColorPicker({
+Name = "视野圈颜色",
+Color = Color3.fromRGB(255, 255, 255),
+Flag = "FOVColor",
+Callback = function(颜色)
+if 视野圈 then
+视野圈.Color = 颜色
+end
+end
+})
+ 
+local 自瞄板块 = 战斗标签页:CreateSection("自瞄（静默）")
+ 
+local 自瞄开关 = 战斗标签页:CreateToggle({
+Name = "开启自瞄",
+CurrentValue = false,
+Flag = "AimbotToggle",
+Callback = function(开关状态)
+自瞄开启 = 开关状态
+end,
+})
+ 
+-- 视觉板块
+local 透视板块 = 视觉标签页:CreateSection("玩家透视")
+ 
+local 透视开关 = 视觉标签页:CreateToggle({
+Name = "开启玩家透视",
+CurrentValue = false,
+Flag = "ESPToggle",
+Callback = function(开关状态)
+玩家透视开启 = 开关状态
+ 
+if 开关状态 then
+for _, 玩家 in pairs(玩家服务:GetPlayers()) do
+if 玩家 ~= 本地玩家 then
+创建透视(玩家)
+end
+end
+ 
+运行服务:BindToRenderStep("UpdateESP", Enum.RenderPriority.Camera.Value + 1, 更新透视)
+else
+运行服务:UnbindFromRenderStep("UpdateESP")
+ 
+for 玩家, _ in pairs(透视对象) do
+移除透视(玩家)
+end
+end
+end,
+})
+ 
+local 透视颜色选择器 = 视觉标签页:CreateColorPicker({
+Name = "透视框体颜色",
+Color = Color3.fromRGB(255, 0, 0),
+Flag = "ESPColor",
+Callback = function(颜色)
+for _, 透视 in pairs(透视对象) do
+透视.框体.Color = 颜色
+透视.追踪线.Color = 颜色
+end
+end
+})
+ 
+local 穿墙透视板块 = 视觉标签页:CreateSection("穿墙透视")
+ 
+local 穿墙透视开关 = 视觉标签页:CreateToggle({
+Name = "开启穿墙透视",
+CurrentValue = false,
+Flag = "XRayToggle",
+Callback = function(开关状态)
+穿墙透视开启 = 开关状态
+开关穿墙透视(开关状态)
+end,
+})
+ 
+local 穿墙透视透明度滑块 = 视觉标签页:CreateSlider({
+Name = "穿墙透视透明度",
+Range = {0, 1},
+Increment = 0.1,
+CurrentValue = 0.7,
+Flag = "XRayTransparency",
+Callback = function(数值)
+if 穿墙透视开启 then
+for 对象, _ in pairs(原始透明度) do
+if 对象 and 对象.Parent then
+对象.Transparency = 数值
+end
+end
+end
+end,
+})
+ 
+-- 杂项板块
+local 移动板块 = 杂项标签页:CreateSection("移动")
+ 
+local 无限跳跃开关 = 杂项标签页:CreateToggle({
+Name = "无限跳跃",
+CurrentValue = false,
+Flag = "InfiniteJump",
+Callback = function(开关状态)
+无限跳跃开启 = 开关状态
+开关无限跳跃(开关状态)
+end,
+})
+ 
+-- 设置板块
+local 信息板块 = 设置标签页:CreateSection("脚本信息")
+ 
+设置标签页:CreateParagraph({
+Title = "XS 枢纽 | 射击游戏",
+Content = "简洁流畅的射击游戏专用脚本\n\n功能列表：\n- 带视野圈的锁敌功能\n- 静默自瞄\n- 玩家透视（框体、名称、血量、距离）\n- 穿墙透视\n\n作者：Xenure"
+})
+ 
+local 控制板块 = 设置标签页:CreateSection("操作控制")
+ 
+设置标签页:CreateKeybind({
+Name = "显示/隐藏界面",
+CurrentKeybind = "RightShift",
+HoldToInteract = false,
+Flag = "UIKeybind",
+Callback = function(按键)
+end,
+})
+ 
+设置标签页:CreateButton({
+Name = "销毁界面",
+Callback = function()
+Luna:Destroy()
+end,
+})
+ 
+-- 主循环
+运行服务.RenderStepped:Connect(function()
+更新视野圈()
+锁敌()
+自瞄()
+end)
+ 
+-- 玩家事件
+玩家服务.PlayerAdded:Connect(function(玩家)
+if 玩家透视开启 and 玩家 ~= 本地玩家 then
+创建透视(玩家)
+end
+end)
+ 
+玩家服务.PlayerRemoving:Connect(function(玩家)
+移除透视(玩家)
+end)
+ 
+-- 通知提示
+Luna:Notification({
+Title = "XS 枢纽 加载完成",
+Content = "脚本已成功加载！",
+Icon = "check_circle",
+ImageSource = "Material"
+})
