@@ -200,7 +200,7 @@ FluentLibrary:GiveSignal(JumpRequestHandler)
 
 local MainWindow = FluentLibrary:CreateWindow({
     SubTitle = '俄亥俄州 2025.12.20',
-    Title = 'XA Hub',
+    Title = 'XS Hub',
     MinimizeKey = Enum.KeyCode.LeftControl,
     Theme = 'Dark',
     Acrylic = false,
