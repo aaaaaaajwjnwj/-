@@ -2146,29 +2146,29 @@ Tabs.A7:Button({
 
 Tabs.A8:Section({Title = "俄亥俄州", Opened = true})
 Tabs.A8:Button({
-    Title = "印钞机",
+    Title = "全枪无后座",
     Value = false,
     Callback = function()
         pcall(function()
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/XTScripthub/Ohio/main/MoneyPrinterFinder"))()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/aaaaaaajwjnwj/-/refs/heads/main/ohio%E5%85%A8%E6%9E%AA%E6%97%A0%E5%90%8E%E5%9D%90%E5%8A%9B.lua"))()
         end)
     end
 })
 Tabs.A8:Button({
-    Title = "传送加自动工作",
+    Title = "自动抢银行",
     Value = false,
     Callback = function()
         pcall(function()
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/LOLking123456/ohio/main/Roblox232"))()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/aaaaaaajwjnwj/-/refs/heads/main/ohio%E6%96%B0%E7%89%88%E8%87%AA%E5%8A%A8%E6%8A%A2%E9%93%B6%E8%A1%8C.lua"))()
         end)
     end
 })
 Tabs.A8:Button({
-    Title = "YFHUB",
+    Title = "自动拾取糖果",
     Value = false,
     Callback = function()
         pcall(function()
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/dingding123hhh/nb/main/jm1051.lua"))()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/aaaaaaajwjnwj/-/refs/heads/main/ohio%E8%87%AA%E5%8A%A8%E6%8D%A1%E5%85%A8%E5%9B%BE%E7%B3%96%E6%9E%9C.lua"))()
         end)
     end
 })
@@ -2182,29 +2182,29 @@ Tabs.A8:Button({
     end
 })
 Tabs.A8:Button({
-    Title = "死亡笔记",
+    Title = "俄亥俄皮肤美化",
     Value = false,
     Callback = function()
         pcall(function()
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/dingding123hhh/tt/main/%E6%AD%BB%E4%BA%A1%E7%AC%94%E8%AE%B0%20(1).txt"))()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/aaaaaaajwjnwj/-/refs/heads/main/ohio%E6%9E%AA%E7%9A%AE%E7%BE%8E%E5%8C%96.lua"))()
         end)
     end
 })
 Tabs.A8:Button({
-    Title = "俄亥俄州1英",
+    Title = "俄亥俄州钱包煤花",
     Value = false,
     Callback = function()
         pcall(function()
-            loadstring(game:HttpGet("https://pastebin.com/raw/0MqfXpvY", true))()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/aaaaaaajwjnwj/-/refs/heads/main/ohio%E7%BE%8E%E5%8C%96%E9%92%B1%E5%8C%85.lua"))()
         end)
     end
 })
 Tabs.A8:Button({
-    Title = "俄亥俄州",
+    Title = "俄亥俄州自动全图ATM",
     Value = false,
     Callback = function()
         pcall(function()
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"))()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/aaaaaaajwjnwj/-/refs/heads/main/%E8%87%AA%E5%8A%A8%E5%85%A8%E5%9B%BEATM.lua"))()
         end)
     end
 })
