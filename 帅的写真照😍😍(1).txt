@@ -1,0 +1,325 @@
+local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/dream77239/china-ui/refs/heads/main/China%20ui.lua"))()
+
+local gradientColors = {
+    "rgb(0, 255, 0)",
+    "rgb(0, 230, 0)",
+    "rgb(0, 210, 0)",
+    "rgb(0, 190, 0)",
+    "rgb(0, 170, 0)",
+    "rgb(0, 150, 0)",
+    "rgb(0, 140, 0)",
+    "rgb(0, 130, 0)",
+    "rgb(0, 120, 0)",
+    "rgb(0, 110, 0)"
+}
+
+local player = game.Players.LocalPlayer
+local username = player.Name
+local coloredUsername = ""
+
+for i = 1, #username do
+    local colorIndex = (i - 1) % #gradientColors + 1
+    coloredUsername = coloredUsername .. '<font color="' .. gradientColors[colorIndex] .. '">' .. username:sub(i, i) .. '</font>'
+end
+
+local version = "v9.1.7.8"
+local coloredVersion = ""
+for i = 1, #version do
+    local colorIndex = (i - 1) % #gradientColors + 1
+    coloredVersion = coloredVersion .. '<font color="' .. gradientColors[colorIndex] .. '">' .. version:sub(i, i) .. '</font>'
+end
+
+local Confirmed = false
+local Settings = {JumpPower = 50, WalkSpeed = 16}
+
+local function CopyKey(key, text)
+    if setclipboard then
+        setclipboard(key)
+    end
+    WindUI:Notify({
+        Title = "成功",
+        Content = text or "已复制到剪贴板",
+        Duration = 2,
+        Icon = "copy"
+    })
+end
+
+local function playSound(soundId)
+    local sound = Instance.new("Sound")
+    sound.SoundId = "rbxassetid://" .. soundId
+    sound.Volume = 1
+    sound.Looped = false
+    sound.Parent = game:GetService("SoundService")
+    sound:Play()
+    task.delay(5, function()
+        sound:Destroy()
+    end)
+end
+
+player.CharacterAdded:Connect(function(char)
+    task.wait(1)
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    if hum then
+        hum.JumpPower = Settings.JumpPower
+        hum.WalkSpeed = Settings.WalkSpeed
+    end
+end)
+
+local gameScripts = {
+    {name = "彩虹朋友", icon = "users", url = "https://raw.githubusercontent.com/aaaaaaajwjnwj/-/refs/heads/main/obfuscated_script-1770525489111.lua"},
+    {name = "驾驶帝国", icon = "car", url = "https://raw.githubusercontent.com/aaaaaaajwjnwj/-/refs/heads/main/obfuscated_script-1770525751596.lua"},
+    {name = "监狱人生", icon = "lock", url = "https://raw.githubusercontent.com/aaaaaaajwjnwj/-/refs/heads/main/obfuscated_script-1770525964028.lua"},
+    {name = "僵尸起义", icon = "zombie", url = "https://raw.githubusercontent.com/aaaaaaajwjnwj/-/refs/heads/main/obfuscated_script-1770526310277.lua"},
+    {name = "忍者传奇", icon = "ninja", url = "https://raw.githubusercontent.com/aaaaaaajwjnwj/-/refs/heads/main/obfuscated_script-1770526469349.lua"},
+    {name = "战争大亨", icon = "tank", url = "https://raw.githubusercontent.com/aaaaaaajwjnwj/-/refs/heads/main/obfuscated_script-1770526626847.lua"},
+    {name = "被遗弃", icon = "ghost", url = "https://raw.githubusercontent.com/aaaaaaajwjnwj/-/refs/heads/main/obfuscated_script-1770526853160.lua"},
+    {name = "刀刃球", icon = "sword", url = "https://raw.githubusercontent.com/aaaaaaajwjnwj/-/refs/heads/main/obfuscated_script-1770527083829.lua"},
+    {name = "格蕾丝", icon = "heart", url = "https://raw.githubusercontent.com/aaaaaaajwjnwj/-/refs/heads/main/obfuscated_script-1770527277871.lua"},
+    {name = "逃离建筑", icon = "building", url = "https://raw.githubusercontent.com/aaaaaaajwjnwj/-/refs/heads/main/obfuscated_script-1770528377157.lua"},
+    {name = "俄亥俄", icon = "map", url = "https://raw.githubusercontent.com/aaaaaaajwjnwj/-/refs/heads/main/obfuscated_script-1770528150774.lua"},
+    {name = "河北唐县", icon = "flag", url = "https://raw.githubusercontent.com/aaaaaaajwjnwj/-/refs/heads/main/obfuscated_script-1770527462824.lua"},
+    {name = "汽车经销大亨", icon = "car", url = "https://raw.githubusercontent.com/aaaaaaajwjnwj/-/refs/heads/main/obfuscated_script-1770527661876.lua"},
+    {name = "最强战场", icon = "trophy", url = "https://raw.githubusercontent.com/aaaaaaajwjnwj/-/refs/heads/main/obfuscated_script-1770527858921.lua"},
+    {name = "摧毁师", icon = "bomb", url = "https://raw.githubusercontent.com/Joshingtonn123/JoshScript/main/SyrexGenesisXDefuseDivision"},
+    {name = "时间回溯", icon = "clock", url = "https://mscripts.vercel.app/scfiles/reverse-script.lua"},
+    {name = "Anime Slap Tower", icon = "tower", url = "https://pastefy.app/aj7u9mDA/raw"},
+}
+
+local function createUI()
+    local Window = WindUI:CreateWindow({
+        Title = "XS｜培根 HUB",
+        Icon = "crown",
+        IconThemed = true,
+        Author = "XS和培根共创",
+        Folder = "CloudHub",
+        Size = UDim2.fromOffset(620, 400),
+        Transparent = true,
+        Theme = "Dark",
+        HideSearchBar = false,
+        ScrollBarEnabled = true,
+        Resizable = true,
+        Background = "https://raw.githubusercontent.com/XxwanhexxX/UN/main/preview_png.png",
+        BackgroundImageTransparency = 0.5,
+        User = {
+            Enabled = true,
+            Callback = function()
+                WindUI:Notify({
+                    Title = "个人信息",
+                    Content = "培根和XS 共创", 
+                    Duration = 2,
+                    Icon = "user"
+                })
+            end,
+            Anonymous = false
+        },
+        SideBarWidth = 200,
+        Search = {
+            Enabled = true,
+            Placeholder = "搜索选项卡...",
+            Callback = function(searchText) end
+        }
+    })
+
+    Window:EditOpenButton({
+        Title = "XS｜HUB",
+        Icon = "crown",
+        CornerRadius = UDim.new(1, 0),
+        StrokeThickness = 3,
+        Color = ColorSequence.new(Color3.fromHex("00FF00")),
+        Draggable = true,
+    })
+
+    Window:Tag({
+        Title = version,
+        Color = Color3.fromHex("#32CD32")
+    })
+
+    task.spawn(function()
+        while task.wait(0.04) do
+            for hue = 0, 1, 0.01 do  
+                local color = Color3.fromHSV(hue, 0.8, 1)  
+                Window:EditOpenButton({ Color = ColorSequence.new(color) })
+            end
+        end
+    end)
+
+    -- 关于
+    local TabAbout = Window:Tab({Title = "关于", Icon = "info"})
+    TabAbout:Paragraph({
+        Title = "用户信息",
+        Desc = string.format(
+            "用户名: %s\n显示名: %s\n用户ID: %d\n账号年龄: %d天",
+            player.Name, player.DisplayName, player.UserId, player.AccountAge
+        ),
+        Image = "user", ImageSize = 20, Color = "White"
+    })
+    TabAbout:Paragraph({
+        Title = "感谢支持",
+        Desc = "作者: XS和培根共创\n版本: " .. version,
+        Image = "heart", ImageSize = 16, Color = "Red"
+    })
+
+    -- 通用功能
+    local TabCommon = Window:Tab({Title = "通用功能", Icon = "settings"})
+
+    TabCommon:Input({
+        Title = "跳跃高度",
+        Placeholder = "输入数值 (20-200)",
+        Default = tostring(Settings.JumpPower),
+        Callback = function(text)
+            local v = tonumber(text)
+            if v and v >= 20 and v <= 200 then
+                Settings.JumpPower = v
+                local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+                if hum then hum.JumpPower = v end
+                WindUI:Notify({Title="成功", Content="跳跃高度已设置为: "..v, Duration=2, Icon="check"})
+            else
+                WindUI:Notify({Title="错误", Content="请输入20-200之间的数字", Duration=2, Icon="alert"})
+            end
+        end
+    })
+
+    TabCommon:Input({
+        Title = "移动速度",
+        Placeholder = "输入数值 (16-150)",
+        Default = tostring(Settings.WalkSpeed),
+        Callback = function(text)
+            local v = tonumber(text)
+            if v and v >= 16 and v <= 150 then
+                Settings.WalkSpeed = v
+                local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+                if hum then hum.WalkSpeed = v end
+                WindUI:Notify({Title="成功", Content="移动速度已设置为: "..v, Duration=2, Icon="check"})
+            else
+                WindUI:Notify({Title="错误", Content="请输入16-150之间的数字", Duration=2, Icon="alert"})
+            end
+        end
+    })
+
+    TabCommon:Input({
+        Title = "重力",
+        Placeholder = "输入数值 (0.1-500)",
+        Default = "196.2",
+        Callback = function(text)
+            local v = tonumber(text)
+            if v and v >= 0.1 and v <= 500 then
+                workspace.Gravity = v
+                WindUI:Notify({Title="成功", Content="重力已设置为: "..v, Duration=2, Icon="check"})
+            else
+                WindUI:Notify({Title="错误", Content="请输入0.1-500之间的数字", Duration=2, Icon="alert"})
+            end
+        end
+    })
+
+    local function addButton(tab, title, url)
+        tab:Button({
+            Title = title,
+            Callback = function()
+                task.spawn(function()
+                    local suc, err = pcall(function()
+                        loadstring(game:HttpGet(url))()
+                    end)
+                    if suc then
+                        WindUI:Notify({Title="成功", Content=title.." 已执行", Duration=2, Icon="check"})
+                    else
+                        WindUI:Notify({Title="错误", Content=title.." 加载失败", Duration=3, Icon="alert"})
+                    end
+                end)
+            end
+        })
+    end
+
+    addButton(TabCommon, "飞", "https://rawscripts.net/raw/Universal-Script-FLY-GUI-BY-TUPAK-76975")
+    addButton(TabCommon, "飞行v3", "https://raw.githubusercontent.com/mciklw/mciklwscript/main/flyvthree")
+    addButton(TabCommon, "子弹追踪", "https://raw.githubusercontent.com/fcsdsss/games/main/Silent%20aim/1.1")
+    addButton(TabCommon, "隐身 [别人看得见]", "https://raw.githubusercontent.com/Yungengxin/roblox/main/yinshen")
+    addButton(TabCommon, "悬空", "https://raw.githubusercontent.com/GhostPlayer352/Test4/main/Float")
+    addButton(TabCommon, "反挂机", "https://pastebin.com/raw/9fFu43FF")
+    addButton(TabCommon, "玩家进入提示", "https://raw.githubusercontent.com/boyscp/scriscriptsc/main/bbn.lua")
+    addButton(TabCommon, "快速射精 R6", "https://pastefy.app/wa3v2Vgm/raw")
+    addButton(TabCommon, "快速射精 R15", "https://pastefy.app/YZoglOyJ/raw")
+    addButton(TabCommon, "隐身道具", "https://gist.githubusercontent.com/skid123skidlol/cd0d2dce51b3f20ad1aac941da06a1a1/raw/f58b98cce7d51e53ade94e7bb460e4f24fb7e0ff")
+
+    -- 催更反馈
+    local TabUpdate = Window:Tab({Title = "催更反馈", Icon = "bell"})
+    TabUpdate:Button({
+        Title = "催更或bug提醒", Icon = "message",
+        Callback = function()
+            WindUI:Notify({
+                Title = "反馈",
+                Content = "请联系作者: 扫福瑞叫爸爸",
+                Duration = 5, Icon = "message"
+            })
+        end
+    })
+    TabUpdate:Button({ Title = "点击复制ks号", Icon = "copy", Callback = function() CopyKey("xisoshusi", "ks号已复制") end })
+    TabUpdate:Button({ Title = "点击复制脚本卡密", Icon = "copy", Callback = function() CopyKey("xsxsxs", "卡密已复制") end })
+    TabUpdate:Paragraph({
+        Title = "更新日志",
+        Desc = "版本 " .. version .. "\n- 新增独立游戏选项卡\n- 优化UI布局\n- 修复已知bug",
+        Image = "list", ImageSize = 16
+    })
+
+    -- 游戏脚本
+    local function AddGameTab(name, icon, url)
+        local tab = Window:Tab({Title = " "..name, Icon = icon})
+        tab:Button({
+            Title = "执行脚本",
+            Icon = "play",
+            Callback = function()
+                task.spawn(function()
+                    local ok = pcall(function() loadstring(game:HttpGet(url))() end)
+                    if ok then
+                        WindUI:Notify({Title=name, Content="已执行", Icon="check"})
+                    else
+                        WindUI:Notify({Title=name, Content="执行失败", Icon="alert"})
+                    end
+                end)
+            end
+        })
+        if name == "河北唐县" then
+            tab:Button({
+                Title = "点击复制脚本卡密",
+                Icon = "copy",
+                Callback = function() CopyKey("xsxsxs","卡密已复制") end
+            })
+        end
+    end
+
+    for _, g in pairs(gameScripts) do
+        AddGameTab(g.name, g.icon, g.url)
+    end
+
+    TabCommon:Select()
+
+    WindUI:Notify({
+        Title = "XS｜培根",
+        Content = "脚本加载完成！已切换为输入框模式",
+        Duration = 4,
+        Icon = "crown"
+    })
+end
+
+-- 弹窗
+WindUI:Popup({
+    Title = '<font color="' .. gradientColors[1] .. '">作者:一野和XS共创</font><font color="' .. gradientColors[5] .. '">脚本</font>',
+    IconThemed = true,
+    Content = "尊敬的用户 " .. coloredUsername .. " \n您使用的 <font color='" .. gradientColors[1] .. "'>XS/培根</font><font color='" .. gradientColors[5] .. "'>公益版</font> 当前版本型号是: " .. coloredVersion .. "\n感谢你的大力支持！ 帅也是要在这里点几个人@✎ℳ๓₯㎕.龙王 @Cyberpunk @素质ᅠ⁧~主人⁧ @唐尧(帝尧) @小司 @小西 @陪ᵘ岁岁年年 ,@ㅤㅤㅤㅤㅤㅤ 这些都是帅的非机杯时也被我们纳入后宫普根是西格玛没有",
+    Buttons = {
+        {
+            Title = "取消",
+            Callback = function() end,
+            Variant = "Secondary",
+        },
+        {
+            Title = "执行",
+            Icon = "arrow-right",
+            Callback = function() 
+                playSound(98686655059380)
+                Confirmed = true
+                task.spawn(createUI)
+            end,
+            Variant = "Primary",
+        }
+    }
+})
